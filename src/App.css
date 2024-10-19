@@ -46,6 +46,10 @@
     justify-content: center;
 }
 
+.form-spacing {
+    margin-bottom: 20px;
+}
+
 a {
     font-weight: 500;
     color: #646cff;
