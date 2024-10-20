@@ -10,17 +10,26 @@
         "tauri": "tauri"
     },
     "dependencies": {
+        "@tauri-apps/api": "^2",
+        "@tauri-apps/plugin-shell": "^2",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "@tauri-apps/api": "^2",
-        "@tauri-apps/plugin-shell": "^2"
+        "rete": "^2.0.5",
+        "rete-area-plugin": "^2.1.3",
+        "rete-auto-arrange-plugin": "^2.0.2",
+        "rete-connection-plugin": "^2.0.5",
+        "rete-context-menu-plugin": "^2.0.4",
+        "rete-engine": "^2.0.2",
+        "rete-react-plugin": "^2.0.7",
+        "rete-render-utils": "^2.0.3",
+        "styled-components": "^6.1.13"
     },
     "devDependencies": {
+        "@tauri-apps/cli": "^2",
         "@types/react": "^18.2.15",
         "@types/react-dom": "^18.2.7",
         "@vitejs/plugin-react": "^4.2.1",
         "typescript": "^5.2.2",
-        "vite": "^5.3.1",
-        "@tauri-apps/cli": "^2"
+        "vite": "^5.3.1"
     }
 }

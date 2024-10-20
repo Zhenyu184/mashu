@@ -1,3 +1,10 @@
+.logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: 0.75s;
+}
+
 .logo.vite:hover {
     filter: drop-shadow(0 0 2em #747bff);
 }
@@ -5,6 +12,7 @@
 .logo.react:hover {
     filter: drop-shadow(0 0 2em #61dafb);
 }
+
 :root {
     font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
     font-size: 16px;
@@ -22,19 +30,27 @@
 }
 
 .container {
+    height: 100%;
+    padding-top: 0vh;
     margin: 0;
-    padding-top: 10vh;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
 }
 
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: 0.75s;
+.sidebar {
+    height: 100%;
+    width: 350px;
+    padding: 20px;
+    flex-shrink: 0;
+    flex-direction: column;
+    box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+.editor-space {
+    flex: 1;
+    padding: 0px;
+    overflow: auto;
+    background-color: #353535;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .logo.tauri:hover {
