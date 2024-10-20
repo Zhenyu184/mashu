@@ -13,7 +13,7 @@ fn greet(name: &str) -> String {
 // 回傳 -> Result<WebDriver, WebDriverError>
 async fn init_browser(url: &str) -> WebDriverResult<WebDriver> {
     let caps = DesiredCapabilities::chrome();
-    let driver = WebDriver::new(url, caps).await?;
+    let driver = WebDriver::new("http://localhost:9515", caps).await?;
     driver.goto(url).await?;
     driver.maximize_window().await?;    // 最大化視窗
     Ok(driver)
@@ -38,11 +38,11 @@ async fn handle_banner(driver: &WebDriver) -> WebDriverResult<()> {
 async fn main_process(url: Option<&str>) -> Result<String, String> {
     println!("main process log 1");
 
-    let url = url.unwrap_or("https://www.gigacomputing.com");
+    let url = url.unwrap_or("https://wikipedia.org");
     
     println!("main process log 2");
     let driver = init_browser(url).await.map_err(|err| {
-        eprintln!("Error initializing browser: {}", err);
+        eprintln!("{}", err);
         format!("{}", err)
     })?;
     
