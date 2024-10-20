@@ -7,6 +7,7 @@ function App() {
     const [greetMsg, setGreetMsg] = useState('');
     const [name, setName] = useState('');
     const [url, setUrl] = useState('');
+    const [url2, setUrl2] = useState('');
 
     async function greet() {
         // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -15,6 +16,11 @@ function App() {
 
     async function get_web_page() {
         const body = (await invoke('get_web_page', { url })) as string;
+        setGreetMsg(body);
+    }
+
+    async function main_process() {
+        const body = (await invoke('main_process', { url2 })) as string;
         setGreetMsg(body);
     }
 
@@ -44,6 +50,17 @@ function App() {
             >
                 <input id='greet-input' onChange={(e) => setUrl(e.currentTarget.value)} placeholder='https://v2.tauri.app/' />
                 <button type='submit'>get web page</button>
+            </form>
+
+            <form
+                className='row form-spacing'
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    main_process();
+                }}
+            >
+                <input id='greet-input' onChange={(e) => setUrl2(e.currentTarget.value)} placeholder='https://v2.tauri.app/' />
+                <button type='submit'>main_process</button>
             </form>
 
             <button type='button' onClick={() => setGreetMsg('')}>Clear</button>

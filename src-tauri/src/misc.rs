@@ -15,3 +15,7 @@ pub async fn http_get(url: &str) -> Result<String, String> {
 
     Err(format!("Failed to fetch the page: {}", response.status()))
 }
+
+pub async fn sleep_milliseconds(milliseconds: u64) {
+    tokio::time::sleep(Duration::from_millis(milliseconds)).await;
+}
