@@ -34,36 +34,6 @@ async fn get_web_page(url: &str) -> Result<String, String> {
     return misc::http_get(url).await;
 }
 
-#[tauri::command]
-fn input_string(body: &str, search: &str, string: &str,) -> Result<String, String> {
-    println!("input string {}", string);
-    if true {
-        return Ok(format!("logged_in {}", string))
-    } 
-
-    Err("invalid credentials".to_string())
-}
-
-#[tauri::command]
-fn press_button_component(body: &str, search: &str) -> Result<String, String> {
-    println!("press {} button component", search);
-    if true {
-        return Ok(format!("logged_in {}", search))
-    }
-    
-    return Err("invalid credentials".to_string())
-}
-
-#[tauri::command]
-fn choose_drop_down_component(body: &str, search: &str) -> Result<String, String> {
-    println!("choose {} drop down component", search);
-    if true {
-        return Ok(format!("logged_in {}", search))
-    }
-    
-    return Err("invalid credentials".to_string())
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -71,10 +41,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             main_process,
-            get_web_page,
-            input_string,
-            press_button_component,
-            choose_drop_down_component
+            get_web_page
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -16,6 +16,7 @@
         {
             "name": "init_web",
             "type": "option",
+            "parameter": { "driver_url": "http://localhost:9515" },
             "continue": {
                 "success": {},
                 "except": {}
@@ -24,6 +25,7 @@
         {
             "name": "open_web",
             "type": "option",
+            "parameter": { "web_url": "www.google.com" },
             "continue": {
                 "success": {},
                 "except": {}
@@ -32,6 +34,7 @@
         {
             "name": "input_string",
             "type": "option",
+            "parameter": { "component": "", "input": "red panda" },
             "continue": {
                 "success": {},
                 "except": {}
@@ -40,6 +43,7 @@
         {
             "name": "press_button",
             "type": "option",
+            "parameter": { "component": "" },
             "continue": {
                 "success": {},
                 "except": {}
@@ -48,6 +52,7 @@
         {
             "name": "sleep",
             "type": "option",
+            "parameter": { "time": 0 },
             "continue": {
                 "success": {},
                 "except": {}
@@ -58,22 +63,16 @@
         {
             "name": "delay",
             "type": "decorate",
+            "parameter": { "front_time": 0, "back_time": 0 },
             "wrapper": {},
             "continue": {
                 "success": {}
             }
         },
         {
-            "name": "strict_concurrent",
+            "name": "concurrent",
             "type": "decorate",
-            "wrapper": [],
-            "continue": {
-                "success": {}
-            }
-        },
-        {
-            "name": "loose_concurrent",
-            "type": "decorate",
+            "parameter": { "strict": true },
             "wrapper": [],
             "continue": {
                 "success": {}
