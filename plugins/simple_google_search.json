@@ -1,21 +1,60 @@
 {
-    "type": "control",
     "name": "head",
-    "continue": [
-        {
+    "type": "control",
+    "continue": {
+        "success": {
+            "name": "init_web",
             "type": "option",
-            "name": "init",
             "continue": {
-                "success": {},
-                "except": {
+                "success": {
+                    "name": "open_web",
                     "type": "option",
-                    "name": "init",
                     "continue": {
-                        "success": {},
-                        "except": {}
+                        "success": {
+                            "name": "input_string",
+                            "type": "option",
+                            "continue": {
+                                "success": {
+                                    "name": "press_button",
+                                    "type": "option",
+                                    "continue": {
+                                        "success": {
+                                            "name": "sleep",
+                                            "type": "option",
+                                            "continue": {
+                                                "success": {
+                                                    "name": "end",
+                                                    "type": "control"
+                                                },
+                                                "except": {
+                                                    "name": "end",
+                                                    "type": "control"
+                                                }
+                                            }
+                                        },
+                                        "except": {
+                                            "name": "end",
+                                            "type": "control"
+                                        }
+                                    }
+                                },
+                                "except": {
+                                    "name": "end",
+                                    "type": "control"
+                                }
+                            }
+                        },
+                        "except": {
+                            "name": "end",
+                            "type": "control"
+                        }
                     }
+                },
+                "except": {
+                    "name": "end",
+                    "type": "control"
                 }
             }
         }
-    ]
+    }
 }

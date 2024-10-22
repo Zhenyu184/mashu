@@ -2,20 +2,20 @@
     "control": [
         {
             "name": "head",
+            "type": "control",
             "continue": {
                 "success": {}
             }
         },
         {
             "name": "end",
-            "continue": {
-                "success": {}
-            }
+            "type": "control"
         }
     ],
     "option": [
         {
             "name": "init_web",
+            "type": "option",
             "continue": {
                 "success": {},
                 "except": {}
@@ -23,6 +23,7 @@
         },
         {
             "name": "open_web",
+            "type": "option",
             "continue": {
                 "success": {},
                 "except": {}
@@ -30,6 +31,7 @@
         },
         {
             "name": "input_string",
+            "type": "option",
             "continue": {
                 "success": {},
                 "except": {}
@@ -37,6 +39,7 @@
         },
         {
             "name": "press_button",
+            "type": "option",
             "continue": {
                 "success": {},
                 "except": {}
@@ -44,6 +47,7 @@
         },
         {
             "name": "sleep",
+            "type": "option",
             "continue": {
                 "success": {},
                 "except": {}
@@ -53,6 +57,7 @@
     "decorate": [
         {
             "name": "delay",
+            "type": "decorate",
             "wrapper": {},
             "continue": {
                 "success": {}
@@ -60,6 +65,7 @@
         },
         {
             "name": "strict_concurrent",
+            "type": "decorate",
             "wrapper": [],
             "continue": {
                 "success": {}
@@ -67,6 +73,7 @@
         },
         {
             "name": "loose_concurrent",
+            "type": "decorate",
             "wrapper": [],
             "continue": {
                 "success": {}
