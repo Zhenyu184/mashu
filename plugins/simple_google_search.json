@@ -1,0 +1,21 @@
+{
+    "type": "control",
+    "name": "head",
+    "continue": [
+        {
+            "type": "option",
+            "name": "init",
+            "continue": {
+                "success": {},
+                "except": {
+                    "type": "option",
+                    "name": "init",
+                    "continue": {
+                        "success": {},
+                        "except": {}
+                    }
+                }
+            }
+        }
+    ]
+}

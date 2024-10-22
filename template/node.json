@@ -1,0 +1,76 @@
+{
+    "control": [
+        {
+            "name": "head",
+            "continue": {
+                "success": {}
+            }
+        },
+        {
+            "name": "end",
+            "continue": {
+                "success": {}
+            }
+        }
+    ],
+    "option": [
+        {
+            "name": "init_web",
+            "continue": {
+                "success": {},
+                "except": {}
+            }
+        },
+        {
+            "name": "open_web",
+            "continue": {
+                "success": {},
+                "except": {}
+            }
+        },
+        {
+            "name": "input_string",
+            "continue": {
+                "success": {},
+                "except": {}
+            }
+        },
+        {
+            "name": "press_button",
+            "continue": {
+                "success": {},
+                "except": {}
+            }
+        },
+        {
+            "name": "sleep",
+            "continue": {
+                "success": {},
+                "except": {}
+            }
+        }
+    ],
+    "decorate": [
+        {
+            "name": "delay",
+            "wrapper": {},
+            "continue": {
+                "success": {}
+            }
+        },
+        {
+            "name": "strict_concurrent",
+            "wrapper": [],
+            "continue": {
+                "success": {}
+            }
+        },
+        {
+            "name": "loose_concurrent",
+            "wrapper": [],
+            "continue": {
+                "success": {}
+            }
+        }
+    ]
+}
