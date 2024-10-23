@@ -8,12 +8,12 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-async fn main_process(url: Option<&str>) -> Result<String, String> {
-    let url = url.unwrap_or("https://wikipedia.org");
-    let driver = option::init_browser(url).await.map_err(|err| {
-        eprintln!("{}", err);
-        format!("{}", err)
-    })?;
+async fn run_workflow(url: Option<&str>) -> Result<String, String> {
+    let driver = option::init_browser().await
+        .map_err(|err| format!("{}", err))?;
+
+    option::open_web(&driver, url.unwrap_or("https://wikipedia.org")).await
+        .map_err(|err| format!("{}", err))?;
 
     option::sleep(Some(1000)).await?;
     
@@ -40,7 +40,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             greet,
-            main_process,
+            run_workflow,
             get_web_page
         ])
         .run(tauri::generate_context!())

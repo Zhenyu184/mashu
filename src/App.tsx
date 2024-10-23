@@ -19,8 +19,8 @@ function App() {
         setGreetMsg(body);
     }
 
-    async function main_process() {
-        const body = (await invoke('main_process', { url2 })) as string;
+    async function run_workflow() {
+        const body = (await invoke('run_workflow', { url2 })) as string;
         setGreetMsg(body);
     }
 
@@ -56,11 +56,11 @@ function App() {
                 className='row form-spacing'
                 onSubmit={(e) => {
                     e.preventDefault();
-                    main_process();
+                    run_workflow();
                 }}
             >
                 <input id='greet-input' onChange={(e) => setUrl2(e.currentTarget.value)} placeholder='https://v2.tauri.app/' />
-                <button type='submit'>main_process</button>
+                <button type='submit'>run workflow</button>
             </form>
 
             <button type='button' onClick={() => setGreetMsg('')}>Clear</button>
