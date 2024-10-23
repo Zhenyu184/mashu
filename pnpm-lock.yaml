@@ -17,6 +17,24 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.3.1(react@18.3.1)
+  rete:
+    specifier: ^2.0.5
+    version: 2.0.5
+  rete-area-plugin:
+    specifier: ^2.1.3
+    version: 2.1.3(rete@2.0.5)
+  rete-auto-arrange-plugin:
+    specifier: ^2.0.2
+    version: 2.0.2(elkjs@0.8.2)(rete-area-plugin@2.1.3)(rete@2.0.5)(web-worker@1.3.0)
+  rete-connection-plugin:
+    specifier: ^2.0.5
+    version: 2.0.5(rete-area-plugin@2.1.3)(rete@2.0.5)
+  rete-context-menu-plugin:
+    specifier: ^2.0.4
+    version: 2.0.4(rete-area-plugin@2.1.3)(rete@2.0.5)
+  rete-engine:
+    specifier: ^2.0.2
+    version: 2.0.2(rete@2.0.5)
   rete-react-plugin:
     specifier: ^2.0.7
     version: 2.0.7(react-dom@18.3.1)(react@18.3.1)(rete-area-plugin@2.1.3)(rete-render-utils@2.0.3)(rete@2.0.5)(styled-components@6.1.13)
@@ -902,6 +920,10 @@ packages:
     resolution: {integrity: sha512-dfdv/2xNjX0P8Vzme4cfzHqnPm5xsZXwsolTYr0eyW18IUmNyG08vL+fttvinTfhKfIKdRoqkDIC9e9iWQCNYQ==}
     dev: true
 
+  /elkjs@0.8.2:
+    resolution: {integrity: sha512-L6uRgvZTH+4OF5NE/MBbzQx/WYpru1xCBE9respNj6qznEewGUIfhzmm7horWWxbNO2M0WckQypGctR8lH79xQ==}
+    dev: false
+
   /esbuild@0.21.5:
     resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==}
     engines: {node: '>=12'}
@@ -1066,6 +1088,52 @@ packages:
     resolution: {integrity: sha512-hz7oFwf6kpV53uLQa1SL7I7G4ZULHgpx+U7YYg90uQGxCHNcXrtjK++AzUEudMYqYzRQtjFv3FongBbXVHOv/w==}
     peerDependencies:
       rete: ^2.0.0
+    dependencies:
+      '@babel/runtime': 7.25.9
+      rete: 2.0.5
+    dev: false
+
+  /rete-auto-arrange-plugin@2.0.2(elkjs@0.8.2)(rete-area-plugin@2.1.3)(rete@2.0.5)(web-worker@1.3.0):
+    resolution: {integrity: sha512-VLTnVb9tqHfQKkFMZzpYgYxDWcIa+nXHRC+Po0k+gUh2zJqegkx8bFSA1n6VkMv+wPYa9EnWsTMfUDD3k1QEzg==}
+    peerDependencies:
+      elkjs: ^0.8.2
+      rete: ^2.0.1
+      rete-area-plugin: ^2.0.0
+      web-worker: ^1.2.0
+    dependencies:
+      '@babel/runtime': 7.25.9
+      elkjs: 0.8.2
+      rete: 2.0.5
+      rete-area-plugin: 2.1.3(rete@2.0.5)
+      web-worker: 1.3.0
+    dev: false
+
+  /rete-connection-plugin@2.0.5(rete-area-plugin@2.1.3)(rete@2.0.5):
+    resolution: {integrity: sha512-KFtlOyEJRc0y9STVgo2T+t+j9u5fxiTxbyzPbMCm0uqncb3b8d2ABDIzvWoNo5zQAh2Oz/OvlUovupbzrGzpSg==}
+    peerDependencies:
+      rete: ^2.0.1
+      rete-area-plugin: ^2.0.0
+    dependencies:
+      '@babel/runtime': 7.25.9
+      rete: 2.0.5
+      rete-area-plugin: 2.1.3(rete@2.0.5)
+    dev: false
+
+  /rete-context-menu-plugin@2.0.4(rete-area-plugin@2.1.3)(rete@2.0.5):
+    resolution: {integrity: sha512-0rgYC1jFeNC6CIOd7VuCaI7guY3sP3fLa07TmjT/cuA5pwka0xQdfaNd+PNJl0zA69jFzX2wVi3cx3jtzr7W/A==}
+    peerDependencies:
+      rete: ^2.0.1
+      rete-area-plugin: ^2.0.0
+    dependencies:
+      '@babel/runtime': 7.25.9
+      rete: 2.0.5
+      rete-area-plugin: 2.1.3(rete@2.0.5)
+    dev: false
+
+  /rete-engine@2.0.2(rete@2.0.5):
+    resolution: {integrity: sha512-+0d0/eSD78+TXD7Bp4DpgeT0jgZ8ngkEbu4uzWIPF6B9ZG6E2dmcRRC/6e+p+0PQ21ixyMKbZziH4tJpJM1J+g==}
+    peerDependencies:
+      rete: ^2.0.1
     dependencies:
       '@babel/runtime': 7.25.9
       rete: 2.0.5
@@ -1258,6 +1326,10 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
+
+  /web-worker@1.3.0:
+    resolution: {integrity: sha512-BSR9wyRsy/KOValMgd5kMyr3JzpdeoR9KVId8u5GVlTTAtNChlsE4yTxeY7zMdNSyOmoKBv8NH2qeRY9Tg+IaA==}
+    dev: false
 
   /yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
