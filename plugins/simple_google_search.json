@@ -24,14 +24,10 @@
                                     "continue": {
                                         "success": {
                                             "name": "sleep",
-                                            "type": "option",
+                                            "type": "control",
                                             "parameter": { "time": 10000 },
                                             "continue": {
                                                 "success": {
-                                                    "name": "end",
-                                                    "type": "control"
-                                                },
-                                                "except": {
                                                     "name": "end",
                                                     "type": "control"
                                                 }

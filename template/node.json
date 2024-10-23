@@ -10,6 +10,22 @@
         {
             "name": "end",
             "type": "control"
+        },
+        {
+            "name": "sleep",
+            "type": "control",
+            "parameter": { "time": 0 },
+            "continue": {
+                "success": {}
+            }
+        },
+        {
+            "name": "timing",
+            "type": "control",
+            "parameter": { "cron": "* * * * *" },
+            "continue": {
+                "success": {}
+            }
         }
     ],
     "option": [
@@ -44,15 +60,6 @@
             "name": "press_button",
             "type": "option",
             "parameter": { "component": "" },
-            "continue": {
-                "success": {},
-                "except": {}
-            }
-        },
-        {
-            "name": "sleep",
-            "type": "option",
-            "parameter": { "time": 0 },
             "continue": {
                 "success": {},
                 "except": {}
