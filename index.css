@@ -1,0 +1,9 @@
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 隱藏溢出的滾動條 */
+    box-sizing: border-box; /* 邊框不影響寬高計算 */
+}
