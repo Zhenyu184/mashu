@@ -60,7 +60,7 @@ function App() {
                         onChange={(e) => setUrl(e.currentTarget.value)}
                         placeholder='https://v2.tauri.app/'
                     />
-                    <button type='submit'>get web page</button>
+                    <button type='submit'>get</button>
                 </form>
 
                 <form
@@ -73,9 +73,9 @@ function App() {
                     <input
                         id='greet-input'
                         onChange={(e) => setUrl2(e.currentTarget.value)}
-                        placeholder='https://v2.tauri.app/'
+                        placeholder='www.google.com'
                     />
-                    <button type='submit'>run workflow</button>
+                    <button type='submit'>run</button>
                 </form>
 
                 <button type='button' onClick={() => setGreetMsg('')}>
