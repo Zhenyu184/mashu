@@ -1,6 +1,8 @@
 use crate::task;
 
+use serde::Deserialize;
 use serde_json::Value;
+use std::error::Error;
 
 pub fn router(node: &Value) -> Result<(), String> {
     let get_value = |key: &str| {
@@ -93,8 +95,65 @@ pub fn pathfinder(script: &Value, current_depth: usize) -> (usize, Option<Value>
     (current_depth, Some(script.clone()))
 }
 
-pub fn app(script: &str) -> Result<String, String> {
-    println!("script: {}", script);
-    // let mut executor = FlowExecutor::new(path);
-    Ok("Workflow executed successfully".to_string())
+#[derive(Deserialize)]
+struct NodeConfig {
+    id: String,
+    node_name: String,
+    node_type: String,
+    parameters: Option<HashMap<String, String>>,
+    success_links: Vec<String>,
+    fail_links: Vec<String>,
+    decorate_links: Vec<String>,
+}
+
+struct StepParser {
+    raw: String,
+}
+
+impl StepParser {
+    fn new(raw: &str) -> Self {
+        println!("StepParser raw");
+        StepParser {
+            raw: raw.to_string(),
+        }
+    }
+}
+
+struct EnvManager {}
+
+impl EnvManager {
+    fn new() -> Self {
+        EnvManager {}
+    }
+}
+
+struct Executor {
+    parser: StepParser,
+    env: EnvManager,
+}
+
+impl Executor {
+    fn new(script_path: &str) -> Self {
+        let parser = StepParser::new(script_path);
+        let env = EnvManager::new();
+        Executor { parser, env }
+    }
+
+    fn run(&mut self) -> Result<(), Box<dyn Error>> {
+        println!("executing flow: {}", self.parser.raw);
+        // parsed = self.parser.find_path()?;
+
+        for i in 0..10 {
+            println!("iteration: {}", i);
+        }
+
+        Ok(())
+    }
+}
+
+pub fn app(script: &str) -> Result<(), Box<dyn Error>> {
+    println!("{}", script);
+    let mut executor = Executor::new(script);
+    executor.run()?;
+    Ok(())
 }
