@@ -2,42 +2,6 @@ use crate::task;
 
 use serde_json::Value;
 
-pub struct WebDriverManager {
-    var1: String,
-    var2: i32,
-    var3: f64,
-}
-
-impl WebDriverManager {
-    pub fn new(var1: String, var2: i32, var3: f64) -> Self {
-        WebDriverManager { var1, var2, var3 }
-    }
-
-    pub fn set_var1(&mut self, value: String) {
-        self.var1 = value;
-    }
-
-    pub fn get_var1(&self) -> &String {
-        &self.var1
-    }
-
-    pub fn set_var2(&mut self, value: i32) {
-        self.var2 = value;
-    }
-
-    pub fn get_var2(&self) -> i32 {
-        self.var2
-    }
-
-    pub fn set_var3(&mut self, value: f64) {
-        self.var3 = value;
-    }
-
-    pub fn get_var3(&self) -> f64 {
-        self.var3
-    }
-}
-
 pub fn router(node: &Value) -> Result<(), String> {
     let get_value = |key: &str| {
         node.get(key)
@@ -52,51 +16,48 @@ pub fn router(node: &Value) -> Result<(), String> {
         ("control", "head") => {
             task::head().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("control", "end") => {
             task::end().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("control", "sleep") => {
             task::sleep(Some(1000)).map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("control", "timing") => {
             task::timing("").map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("option", "init_web") => {
             task::init_web().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("option", "open_web") => {
             task::open_web().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("option", "input_string") => {
             task::input_string().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("option", "press_button") => {
             crate::task::press_button().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("decorate", "delay") => {
             task::delay().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         ("decorate", "concurrent") => {
             task::concurrent().map_err(|e| e.to_string())?;
             Ok(())
-        },
+        }
         _ => Err(format!("Unknown node type: '{}'", node_type)),
     }
-} 
+}
 
 pub fn pathfinder(script: &Value, current_depth: usize) -> (usize, Option<Value>) {
-
-    let wm = WebDriverManager::new("example".to_string(), 42, 3.14);
-
     if !script.is_object() {
         return (0, None);
     }
@@ -132,7 +93,8 @@ pub fn pathfinder(script: &Value, current_depth: usize) -> (usize, Option<Value>
     (current_depth, Some(script.clone()))
 }
 
-pub fn app(script: Value) -> Result<String, String> {
-    pathfinder(&script, 0);
+pub fn app(script: &str) -> Result<String, String> {
+    println!("script: {}", script);
+    // let mut executor = FlowExecutor::new(path);
     Ok("Workflow executed successfully".to_string())
 }
