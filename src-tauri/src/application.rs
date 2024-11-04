@@ -171,8 +171,9 @@ impl StepParser {
     }
 
     fn parse_script(&mut self, script: &str) -> Result<(), Box<dyn Error>> {
-        let node_pattern =
-            Regex::new(r#"(\w+)\["name:\s*(\w+),\s*type:\s*(\w+)(?:,\s*para:\s*{(.*)})?\"]"#)?;
+        let node_pattern = Regex::new(
+            r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#
+        )?;
         let edge_pattern = Regex::new(r#"(\w+)\s*-->\|\s*(\w+)\s*\|\s*(\w+)"#)?;
 
         for cap in node_pattern.captures_iter(script) {
