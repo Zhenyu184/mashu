@@ -54,3 +54,117 @@ impl Task for BaseTask {
         ExecutionResult::Success
     }
 }
+
+pub struct ControlTask {
+    base: BaseTask,
+}
+
+impl ControlTask {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        ControlTask {
+            base: BaseTask::new(task_name, "ControlTask", task_para),
+        }
+    }
+}
+
+impl Task for ControlTask {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Control Task: {}", self.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct OperateTask {
+    base: BaseTask,
+}
+
+impl OperateTask {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        OperateTask {
+            base: BaseTask::new(task_name, "OperateTask", task_para),
+        }
+    }
+}
+
+impl Task for OperateTask {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Operate Task: {}", self.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct DecorateTask {
+    base: BaseTask,
+}
+
+impl DecorateTask {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        DecorateTask {
+            base: BaseTask::new(task_name, "DecorateTask", task_para),
+        }
+    }
+}
+
+impl Task for DecorateTask {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Decorate Task: {}", self.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct ControlTask1 {
+    base: ControlTask,
+}
+
+impl ControlTask1 {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        ControlTask1 {
+            base: ControlTask::new(task_name, task_para),
+        }
+    }
+}
+
+impl Task for ControlTask1 {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Control Task 1: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct ControlTask2 {
+    base: ControlTask,
+}
+
+impl ControlTask2 {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        ControlTask2 {
+            base: ControlTask::new(task_name, task_para),
+        }
+    }
+}
+
+impl Task for ControlTask2 {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Control Task 2: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct ControlTask3 {
+    base: ControlTask,
+}
+
+impl ControlTask3 {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        ControlTask3 {
+            base: ControlTask::new(task_name, task_para),
+        }
+    }
+}
+
+impl Task for ControlTask3 {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Control Task 3: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
