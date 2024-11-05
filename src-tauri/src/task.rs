@@ -112,59 +112,78 @@ impl Task for DecorateTask {
     }
 }
 
-pub struct ControlTask1 {
+pub struct HeadTack {
     base: ControlTask,
 }
 
-impl ControlTask1 {
+impl HeadTack {
     pub fn new(task_name: &str, task_para: &str) -> Self {
-        ControlTask1 {
+        HeadTack {
             base: ControlTask::new(task_name, task_para),
         }
     }
 }
 
-impl Task for ControlTask1 {
+impl Task for HeadTack {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Task 1: {}", self.base.base.task_name));
+        workspace.log(&format!("Executing Head Tack: {}", self.base.base.task_name));
         ExecutionResult::Success
     }
 }
 
-pub struct ControlTask2 {
+pub struct EndTack {
     base: ControlTask,
 }
 
-impl ControlTask2 {
+impl EndTack {
     pub fn new(task_name: &str, task_para: &str) -> Self {
-        ControlTask2 {
+        EndTack {
             base: ControlTask::new(task_name, task_para),
         }
     }
 }
 
-impl Task for ControlTask2 {
+impl Task for EndTack {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Task 2: {}", self.base.base.task_name));
+        workspace.log(&format!("Executing Control End Tack: {}", self.base.base.task_name));
         ExecutionResult::Success
     }
 }
 
-pub struct ControlTask3 {
+pub struct SleepTack {
     base: ControlTask,
 }
 
-impl ControlTask3 {
+impl SleepTack {
     pub fn new(task_name: &str, task_para: &str) -> Self {
-        ControlTask3 {
+        SleepTack {
             base: ControlTask::new(task_name, task_para),
         }
     }
 }
 
-impl Task for ControlTask3 {
+impl Task for SleepTack {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Task 3: {}", self.base.base.task_name));
+        workspace.log(&format!("Executing Control Sleep Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct TimingTack {
+    base: ControlTask,
+}
+
+impl TimingTack {
+    pub fn new(task_name: &str, task_para: &str) -> Self {
+        TimingTack {
+            base: ControlTask::new(task_name, task_para),
+        }
+    }
+}
+
+impl Task for TimingTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Control Timing Task: {}", self.base.base.task_name));
         ExecutionResult::Success
     }
 }
