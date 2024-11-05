@@ -138,17 +138,30 @@ impl TaskWorkspace {
     }
 }
 
+struct BaseTask {
+    task_name: String,
+    task_type: String,
+    task_para: String,
+}
+
+impl BaseTask {
+    fn new(task_name: &str, task_type: &str, task_para: &str) -> Self {
+        BaseTask {
+            task_name: task_name.to_string(),
+            task_type: task_type.to_string(),
+            task_para: task_para.to_string(),
+        }
+    }
+}
+
 trait Task {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult;
 }
 
-struct PrintTask {
-    message: String,
-}
-
-impl Task for PrintTask {
+impl Task for BaseTask {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("print tesk: {}", self.message));
+        println!("run task print");
+        workspace.log(&format!("task: {}", self.task_name));
         ExecutionResult::Success
     }
 }
@@ -166,33 +179,36 @@ impl StepParser {
         }
     }
 
-    fn register_task_type(&mut self, task_type: &str, task: Box<dyn Task>) {
-        self.task_definitions.insert(task_type.to_string(), task);
+    fn register_task(&mut self, k: &str, v: Box<dyn Task>) {
+        self.task_definitions.insert(k.to_string(), v);
     }
 
-    fn parse_script(&mut self, script: &str) -> Result<(), Box<dyn Error>> {
-        let node_pattern = Regex::new(
-            r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#
-        )?;
+    fn parse_script(&mut self, raw: &str) -> Result<(), Box<dyn Error>> {
+        let node_pattern = Regex::new(r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#)?;
         let edge_pattern = Regex::new(r#"(\w+)\s*-->\|\s*(\w+)\s*\|\s*(\w+)"#)?;
 
-        for cap in node_pattern.captures_iter(script) {
-            let node_id = cap[1].to_string();
-            let node_type = cap[3].to_string();
-            let node_index = self.flow_graph.add_node(node_id.clone());
+        for cap in node_pattern.captures_iter(raw) {
+            let node_id = cap.get(1).map_or("".to_string(), |p| p.as_str().to_string());
+            let node_name = cap.get(2).map_or("".to_string(), |p| p.as_str().to_string());
+            let node_type = cap.get(3).map_or("".to_string(), |p| p.as_str().to_string());
+            let node_para = cap.get(4).map_or("".to_string(), |p| p.as_str().to_string());
 
-            // register tesk type
-            if node_type == "print" {
-                let task = PrintTask {
-                    message: cap
-                        .get(4)
-                        .map_or("".to_string(), |m| m.as_str().to_string()),
-                };
-                self.register_task_type(&node_id, Box::new(task));
+            self.flow_graph.add_node(node_id.clone());
+
+            // register task type
+            if node_type == "control" || node_name == "head" {
+                self.register_task(
+                    &node_id,
+                    Box::new(BaseTask {
+                        task_name: node_name,
+                        task_type: node_type,
+                        task_para: node_para,
+                    })
+                );
             }
         }
 
-        for cap in edge_pattern.captures_iter(script) {
+        for cap in edge_pattern.captures_iter(raw) {
             let source = cap[1].to_string();
             let target = cap[3].to_string();
             if let (Some(src_idx), Some(dst_idx)) = (
