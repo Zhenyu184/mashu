@@ -26,31 +26,32 @@ function App() {
     }
 
     async function run_workflow() {
-        const raw = `flowchart TD
-            ct001["name: head,  type: control"]
-            ct002["name: end,   type: control"]
-            ct003["name: sleep, type: control, para: { ms:5000 }"]
-            op001["name: init_web, type: option, para: { url:'http://localhost:9515' }"]
-            op002["name: open_web, type: option, para: { url:'www.google.com' }"]
-            de001["name: concurrent,   type: decorate"] 
-            op003["name: input_string, type: option, para: { component:'', input:'red panda' }"]
-            op004["name: input_string, type: option, para: { component:'', input:'very cute' }"]
-            op005["name: press_button, type: option, para: { component:'' }"]
+        const raw = `
+            flowchart TD
+                ct001["name: head,  type: control"]
+                ct002["name: end,   type: control"]
+                ct003["name: sleep, type: control, para: { ms:5000 }"]
+                op001["name: init_web, type: operate, para: { url:'http://localhost:9515' }"]
+                op002["name: open_web, type: operate, para: { url:'www.google.com' }"]
+                de001["name: concurrent,   type: decorate"] 
+                op003["name: input_string, type: operate, para: { component:'', input:'red panda' }"]
+                op004["name: input_string, type: operate, para: { component:'', input:'very cute' }"]
+                op005["name: press_button, type: operate, para: { component:'' }"]
 
-            ct001 -->|success| op001
-            op001 -->|success| op002
-            op002 -->|success| de001
-            op005 -->|success| ct003
-            ct003 -->|success| ct002
-            de001 -->|success| op005
+                ct001 -->|success| op001
+                op001 -->|success| op002
+                op002 -->|success| de001
+                op005 -->|success| ct003
+                ct003 -->|success| ct002
+                de001 -->|success| op005
 
-            op001 -->|fail| ct002
-            op002 -->|fail| ct002
-            op005 -->|fail| ct002
-            de001 -->|fail| ct002
+                op001 -->|fail| ct002
+                op002 -->|fail| ct002
+                op005 -->|fail| ct002
+                de001 -->|fail| ct002
 
-            de001 -->|decorate| op003
-            de001 -->|decorate| op004
+                de001 -->|decorate| op003
+                de001 -->|decorate| op004
         `;
 
         try {

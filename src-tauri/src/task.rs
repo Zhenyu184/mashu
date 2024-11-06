@@ -31,15 +31,13 @@ impl TaskWorkspace {
 pub struct BaseTask {
     pub task_name: String,
     pub task_type: String,
-    pub task_para: String,
 }
 
 impl BaseTask {
-    pub fn new(task_name: &str, task_type: &str, task_para: &str) -> Self {
+    pub fn new(task_name: &str, task_type: &str) -> Self {
         BaseTask {
             task_name: task_name.to_string(),
             task_type: task_type.to_string(),
-            task_para: task_para.to_string(),
         }
     }
 }
@@ -50,7 +48,7 @@ pub trait Task {
 
 impl Task for BaseTask {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing {} task: {}", self.task_type, self.task_name));
+        workspace.log(&format!("Executing BaseTask task, type: {} name: {}", self.task_type, self.task_name));
         ExecutionResult::Success
     }
 }
@@ -60,9 +58,9 @@ pub struct ControlTask {
 }
 
 impl ControlTask {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
+    pub fn new(task_name: &str) -> Self {
         ControlTask {
-            base: BaseTask::new(task_name, "ControlTask", task_para),
+            base: BaseTask::new(task_name, "control"),
         }
     }
 }
@@ -74,52 +72,14 @@ impl Task for ControlTask {
     }
 }
 
-pub struct OperateTask {
-    base: BaseTask,
-}
-
-impl OperateTask {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
-        OperateTask {
-            base: BaseTask::new(task_name, "OperateTask", task_para),
-        }
-    }
-}
-
-impl Task for OperateTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Operate Task: {}", self.base.task_name));
-        ExecutionResult::Success
-    }
-}
-
-pub struct DecorateTask {
-    base: BaseTask,
-}
-
-impl DecorateTask {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
-        DecorateTask {
-            base: BaseTask::new(task_name, "DecorateTask", task_para),
-        }
-    }
-}
-
-impl Task for DecorateTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Decorate Task: {}", self.base.task_name));
-        ExecutionResult::Success
-    }
-}
-
 pub struct HeadTack {
     base: ControlTask,
 }
 
 impl HeadTack {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
+    pub fn new() -> Self {
         HeadTack {
-            base: ControlTask::new(task_name, task_para),
+            base: ControlTask::new("head"),
         }
     }
 }
@@ -136,9 +96,9 @@ pub struct EndTack {
 }
 
 impl EndTack {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
+    pub fn new() -> Self {
         EndTack {
-            base: ControlTask::new(task_name, task_para),
+            base: ControlTask::new("end"),
         }
     }
 }
@@ -152,12 +112,14 @@ impl Task for EndTack {
 
 pub struct SleepTack {
     base: ControlTask,
+    time: u128
 }
 
 impl SleepTack {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
+    pub fn new(millisecond: Option<u128>) -> Self {
         SleepTack {
-            base: ControlTask::new(task_name, task_para),
+            base: ControlTask::new("sleep"),
+            time: millisecond.unwrap_or(1000),
         }
     }
 }
@@ -171,12 +133,14 @@ impl Task for SleepTack {
 
 pub struct TimingTack {
     base: ControlTask,
+    cron: String,
 }
 
 impl TimingTack {
-    pub fn new(task_name: &str, task_para: &str) -> Self {
+    pub fn new(cron: Option<&str>) -> Self {
         TimingTack {
-            base: ControlTask::new(task_name, task_para),
+            base: ControlTask::new("timing"),
+            cron: cron.unwrap_or("* * * * *").to_string(),
         }
     }
 }
@@ -184,6 +148,44 @@ impl TimingTack {
 impl Task for TimingTack {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
         workspace.log(&format!("Executing Control Timing Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct OperateTask {
+    base: BaseTask,
+}
+
+impl OperateTask {
+    pub fn new(task_name: &str) -> Self {
+        OperateTask {
+            base: BaseTask::new(task_name, "operate"),
+        }
+    }
+}
+
+impl Task for OperateTask {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Operate Task: {}", self.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct DecorateTask {
+    base: BaseTask,
+}
+
+impl DecorateTask {
+    pub fn new(task_name: &str) -> Self {
+        DecorateTask {
+            base: BaseTask::new(task_name, "decorate"),
+        }
+    }
+}
+
+impl Task for DecorateTask {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Decorate Task: {}", self.base.task_name));
         ExecutionResult::Success
     }
 }
