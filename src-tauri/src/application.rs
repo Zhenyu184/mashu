@@ -22,6 +22,20 @@ impl StepParser {
         self.task_definitions.insert(k.to_string(), v);
     }
 
+    fn register(&mut self, node_id: String, node_type: String, node_name: String, node_para: String) {
+        let task: Box<dyn Task> = match (node_type.as_str(), node_name.as_str()) {
+            ("control", "head") => Box::new(HeadTack::new()),
+            ("control", "end") => Box::new(EndTack::new()),
+            ("control", "sleep") => Box::new(SleepTack::new(Some(1000))),
+            ("control", "timing") => Box::new(TimingTack::new(Some("2 3 0 0 1"))),
+            _ => Box::new(BaseTask {
+                task_name: node_name,
+                task_type: node_type,
+            }),
+        };
+        self.register_task(&node_id, task);
+    }
+
     fn parse_script(&mut self, raw: &str) -> Result<(), Box<dyn Error>> {
         let node_pattern = Regex::new(r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#)?;
         let edge_pattern = Regex::new(r#"(\w+)\s*-->\|\s*(\w+)\s*\|\s*(\w+)"#)?;
@@ -34,42 +48,7 @@ impl StepParser {
             self.flow_graph.add_node(node_id.clone());
             
             println!("register {} {} {}", node_name, node_type, node_para);
-            match (node_type.as_str(), node_name.as_str()) {
-                ("control", "head") => {
-                    self.register_task(
-                        &node_id,
-                        Box::new(HeadTack::new()),
-                    );
-                },
-                ("control", "end") => {
-                    self.register_task(
-                        &node_id,
-                        Box::new(EndTack::new()),
-                    );
-                },
-                ("control", "sleep") => {
-                    self.register_task(
-                        &node_id,
-                        Box::new(SleepTack::new(Some(1000))),
-                    );
-                },
-                ("control", "timing") => {
-                    self.register_task(
-                        &node_id,
-                        Box::new(TimingTack::new(Some("2 3 0 0 1"))),
-                    );
-                },
-                _ => {
-                    self.register_task(
-                        &node_id,
-                        Box::new(BaseTask {
-                            task_name: node_name,
-                            task_type: node_type,
-                        }),
-                    );
-                }
-            }
-            
+            self.register(node_id, node_type, node_name, node_para);
         }
 
         for cap in edge_pattern.captures_iter(raw) {
