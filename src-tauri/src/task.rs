@@ -171,6 +171,82 @@ impl Task for OperateTask {
     }
 }
 
+pub struct InitWebTack {
+    base: OperateTask,
+}
+
+impl InitWebTack {
+    pub fn new() -> Self {
+        InitWebTack {
+            base: OperateTask::new("init_web"),
+        }
+    }
+}
+
+impl Task for InitWebTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing operate init web Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct OpenWebTack {
+    base: OperateTask,
+}
+
+impl OpenWebTack {
+    pub fn new() -> Self {
+        OpenWebTack {
+            base: OperateTask::new("open_web"),
+        }
+    }
+}
+
+impl Task for OpenWebTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing operate open web Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct InputStringTack {
+    base: OperateTask,
+}
+
+impl InputStringTack {
+    pub fn new() -> Self {
+        InputStringTack {
+            base: OperateTask::new("input_string"),
+        }
+    }
+}
+
+impl Task for InputStringTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing operate input string Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct PressButtonTack {
+    base: OperateTask,
+}
+
+impl PressButtonTack {
+    pub fn new() -> Self {
+        PressButtonTack {
+            base: OperateTask::new("press_button"),
+        }
+    }
+}
+
+impl Task for PressButtonTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing operate press button Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
 pub struct DecorateTask {
     base: BaseTask,
 }
@@ -186,6 +262,44 @@ impl DecorateTask {
 impl Task for DecorateTask {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
         workspace.log(&format!("Executing Decorate Task: {}", self.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct DelayTack {
+    base: DecorateTask,
+}
+
+impl DelayTack {
+    pub fn new() -> Self {
+        DelayTack {
+            base: DecorateTask::new("delay"),
+        }
+    }
+}
+
+impl Task for DelayTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Decorate Delay Task: {}", self.base.base.task_name));
+        ExecutionResult::Success
+    }
+}
+
+pub struct ConcurrentTack {
+    base: DecorateTask,
+}
+
+impl ConcurrentTack {
+    pub fn new() -> Self {
+        ConcurrentTack {
+            base: DecorateTask::new("concurrent"),
+        }
+    }
+}
+
+impl Task for ConcurrentTack {
+    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+        workspace.log(&format!("Executing Decorate concurrent Task: {}", self.base.base.task_name));
         ExecutionResult::Success
     }
 }

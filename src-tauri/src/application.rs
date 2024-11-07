@@ -3,7 +3,22 @@ use std::error::Error;
 use std::collections::{HashMap, HashSet};
 use petgraph::graph::{DiGraph, NodeIndex};
 
-use crate::task::{Task, BaseTask, HeadTack, EndTack, SleepTack, TimingTack, TaskWorkspace, ExecutionResult};
+use crate::task::{
+    Task,
+    BaseTask,
+    HeadTack,
+    EndTack,
+    SleepTack,
+    TimingTack,
+    InitWebTack,
+    OpenWebTack,
+    PressButtonTack,
+    InputStringTack,
+    ExecutionResult,
+    DelayTack,
+    ConcurrentTack,
+    TaskWorkspace,
+};
 
 struct StepParser {
     task_definitions: HashMap<String, Box<dyn Task>>,
@@ -28,6 +43,12 @@ impl StepParser {
             ("control", "end") => Box::new(EndTack::new()),
             ("control", "sleep") => Box::new(SleepTack::new(Some(1000))),
             ("control", "timing") => Box::new(TimingTack::new(Some("2 3 0 0 1"))),
+            ("operate", "init_web") => Box::new(InitWebTack::new()),
+            ("operate", "open_web") => Box::new(OpenWebTack::new()),
+            ("operate", "input_string") => Box::new(InputStringTack::new()),
+            ("operate", "press_button") => Box::new(PressButtonTack::new()),
+            ("decorate", "delay") => Box::new(DelayTack::new()),
+            ("decorate", "concurrent") => Box::new(ConcurrentTack::new()),
             _ => Box::new(BaseTask {
                 task_name: node_name,
                 task_type: node_type,
@@ -39,7 +60,6 @@ impl StepParser {
     fn parse_script(&mut self, raw: &str) -> Result<(), Box<dyn Error>> {
         let node_pattern = Regex::new(r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#)?;
         let edge_pattern = Regex::new(r#"(\w+)\s*-->\|\s*(\w+)\s*\|\s*(\w+)"#)?;
-
         for cap in node_pattern.captures_iter(raw) {
             let node_id = cap.get(1).map_or("".to_string(), |p| p.as_str().to_string());
             let node_name = cap.get(2).map_or("".to_string(), |p| p.as_str().to_string());
@@ -47,7 +67,6 @@ impl StepParser {
             let node_para = cap.get(4).map_or("".to_string(), |p| p.as_str().to_string());
             self.flow_graph.add_node(node_id.clone());
             
-            println!("register {} {} {}", node_name, node_type, node_para);
             self.register(node_id, node_type, node_name, node_para);
         }
 
