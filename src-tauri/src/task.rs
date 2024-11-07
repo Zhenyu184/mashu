@@ -1,16 +1,18 @@
 use std::collections::HashMap;
+use thirtyfour::prelude::*;
 
 #[derive(Debug)]
 pub enum ExecutionResult {
     Success,
     Failure,
-    Skipped,
+    Decorate,
 }
 
 #[derive(Debug, Default)]
 pub struct TaskWorkspace {
     pub variables: HashMap<String, String>,
     pub execution_log: Vec<String>,
+    pub web_driver: Option<WebDriver>,
 }
 
 impl TaskWorkspace {
@@ -20,6 +22,15 @@ impl TaskWorkspace {
 
     pub fn get_variable(&self, key: &str) -> Option<&String> {
         self.variables.get(key)
+    }
+
+    pub fn set_web_driver(&mut self, driver: WebDriver) -> bool {
+        self.web_driver = Some(driver);
+        self.web_driver.is_some()
+    }
+
+    pub fn get_web_driver(&self) -> Option<&WebDriver> {
+        self.web_driver.as_ref()
     }
 
     pub fn log(&mut self, message: &str) {
@@ -183,10 +194,24 @@ impl InitWebTack {
     }
 }
 
+use futures::executor;
+
 impl Task for InitWebTack {
     fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing operate init web Task: {}", self.base.base.task_name));
-        ExecutionResult::Success
+        let browser = DesiredCapabilities::chrome();
+
+        match executor::block_on(WebDriver::new("http://localhost:64175", browser)) {
+            Ok(driver) => {
+                if workspace.set_web_driver(driver) {
+                    ExecutionResult::Success
+                } else {
+                    ExecutionResult::Failure
+                }
+            }
+            Err(e) => {
+                ExecutionResult::Failure
+            }
+        }
     }
 }
 

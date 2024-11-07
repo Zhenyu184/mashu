@@ -118,7 +118,7 @@ impl Executor {
         match result {
             ExecutionResult::Success => self._navigate_next_task(node, "success"),
             ExecutionResult::Failure => self._navigate_next_task(node, "fail"),
-            ExecutionResult::Skipped => self._navigate_next_task(node, "skip"),
+            ExecutionResult::Decorate => self._navigate_next_task(node, "decorate"),
             _ => {}
         }
     }
