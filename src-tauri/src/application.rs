@@ -60,6 +60,7 @@ impl StepParser {
     fn parse_script(&mut self, raw: &str) -> Result<(), Box<dyn Error>> {
         let node_pattern = Regex::new(r#"(\w+)\["name:\s*([\w\s]+),\s*type:\s*(\w+)(?:,\s*para:\s*\{([^}]*)\})?\s*"\]"#)?;
         let edge_pattern = Regex::new(r#"(\w+)\s*-->\|\s*(\w+)\s*\|\s*(\w+)"#)?;
+
         for cap in node_pattern.captures_iter(raw) {
             let node_id = cap.get(1).map_or("".to_string(), |p| p.as_str().to_string());
             let node_name = cap.get(2).map_or("".to_string(), |p| p.as_str().to_string());
@@ -82,7 +83,6 @@ impl StepParser {
                 self.tf.add_edge(src_idx, dst_idx, decide);
             }
         }
-        
         Ok(())
     }
 }
@@ -139,7 +139,6 @@ impl Executor {
                 self._result_handle(curr, result);
             }
         }
-
         Ok(())
     }
 }
