@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::error::Error;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use petgraph::graph::{DiGraph, NodeIndex};
 
 use crate::task::{
@@ -102,14 +102,31 @@ impl Executor {
     }
 
     fn execute_flow(&mut self) -> Result<(), Box<dyn Error>> {
-        let mut executed_steps: HashSet<String> = HashSet::new();
+        let mut queue = VecDeque::new();
 
-        for node_index in self.parser.tf.node_indices() {
-            let node_id = self.parser.tf[node_index].clone();
+        for i in self.parser.tf.node_indices() {
+            if self.parser.tf.neighbors_directed(i, petgraph::Direction::Incoming).count() == 0 {
+                queue.push_back(i);
+                break;
+            }
+        }
+
+        while let Some(curr) = queue.pop_front() {
+            let node_id = self.parser.tf[curr].clone();
+
             if let Some(task) = self.parser.td.get(&node_id) {
                 let result = task.execute(&mut self.workspace);
+
                 if let ExecutionResult::Success = result {
-                    executed_steps.insert(node_id);
+                    for neighbor in self.parser.tf.neighbors_directed(curr, petgraph::Direction::Outgoing) {
+                        if let Some(edge) = self.parser.tf.find_edge(curr, neighbor) {
+                            if let Some(decide) = self.parser.tf.edge_weight(edge) {
+                                if decide == "success" {
+                                    queue.push_back(neighbor);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
