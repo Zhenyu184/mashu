@@ -22,7 +22,7 @@ use crate::task::{
 
 struct StepParser {
     td: HashMap<String, Box<dyn Task>>, // td means task depositary
-    tf: DiGraph<String, String>, // tf means task flowchart
+    tf: DiGraph<String, String>,        // tf means task flowchart
 }
 
 impl StepParser {
@@ -88,6 +88,7 @@ impl StepParser {
 }
 struct Executor {
     parser: StepParser,
+    queue: VecDeque<NodeIndex>,
     workspace: TaskWorkspace,
 }
 
@@ -97,46 +98,45 @@ impl Executor {
         parser.parse_script(script).expect("parser fail");
         Executor {
             parser,
+            queue: VecDeque::new(),
             workspace: TaskWorkspace::default(),
         }
     }
 
-    fn _navigate_next_task(&self, node: NodeIndex, result: &str, queue: &mut VecDeque<NodeIndex>) {
+    fn _navigate_next_task(&mut self, node: NodeIndex, result: &str) {
         for neighbor in self.parser.tf.neighbors_directed(node, petgraph::Direction::Outgoing) {
             if let Some(edge) = self.parser.tf.find_edge(node, neighbor) {
                 if self.parser.tf.edge_weight(edge) == Some(&result.to_string()) {
-                    queue.push_back(neighbor);
+                    self.queue.push_back(neighbor);
                     break;
                 }
             }
         }
     }
 
-    fn _result_handle(&self, node: NodeIndex, result: ExecutionResult, queue: &mut VecDeque<NodeIndex>) {
+    fn _result_handle(&mut self, node: NodeIndex, result: ExecutionResult) {
         match result {
-            ExecutionResult::Success => self._navigate_next_task(node, "success", queue),
-            ExecutionResult::Failure => self._navigate_next_task(node, "fail", queue),
-            ExecutionResult::Skipped => self._navigate_next_task(node, "skip", queue),
+            ExecutionResult::Success => self._navigate_next_task(node, "success"),
+            ExecutionResult::Failure => self._navigate_next_task(node, "fail"),
+            ExecutionResult::Skipped => self._navigate_next_task(node, "skip"),
             _ => {}
         }
     }
 
     fn execute_flow(&mut self) -> Result<(), Box<dyn Error>> {
-        let mut queue = VecDeque::new();
-
         for i in self.parser.tf.node_indices() {
             if self.parser.tf.neighbors_directed(i, petgraph::Direction::Incoming).count() == 0 {
-                queue.push_back(i);
+                self.queue.push_back(i);
                 break;
             }
         }
 
-        while let Some(curr) = queue.pop_front() {
+        while let Some(curr) = self.queue.pop_front() {
             let node_id = self.parser.tf[curr].clone();
         
             if let Some(task) = self.parser.td.get(&node_id) {
                 let result = task.execute(&mut self.workspace);
-                self._result_handle(curr, result, &mut queue);
+                self._result_handle(curr, result);
             }
         }
 
