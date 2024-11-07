@@ -21,20 +21,20 @@ use crate::task::{
 };
 
 struct StepParser {
-    task_definitions: HashMap<String, Box<dyn Task>>,
-    flow_graph: DiGraph<String, String>,
+    td: HashMap<String, Box<dyn Task>>, // td means task depositary
+    tf: DiGraph<String, String>, // tf means task flowchart
 }
 
 impl StepParser {
     fn new() -> Self {
         StepParser {
-            task_definitions: HashMap::new(),
-            flow_graph: DiGraph::new(),
+            td: HashMap::new(),
+            tf: DiGraph::new(),
         }
     }
 
     fn register_task(&mut self, k: &str, v: Box<dyn Task>) {
-        self.task_definitions.insert(k.to_string(), v);
+        self.td.insert(k.to_string(), v);
     }
 
     fn register(&mut self, node_id: String, node_type: String, node_name: String, node_para: String) {
@@ -42,7 +42,7 @@ impl StepParser {
             ("control", "head") => Box::new(HeadTack::new()),
             ("control", "end") => Box::new(EndTack::new()),
             ("control", "sleep") => Box::new(SleepTack::new(Some(1000))),
-            ("control", "timing") => Box::new(TimingTack::new(Some("2 3 0 0 1"))),
+            ("control", "timing") => Box::new(TimingTack::new(Some("* * * * *"))),
             ("operate", "init_web") => Box::new(InitWebTack::new()),
             ("operate", "open_web") => Box::new(OpenWebTack::new()),
             ("operate", "input_string") => Box::new(InputStringTack::new()),
@@ -65,8 +65,8 @@ impl StepParser {
             let node_name = cap.get(2).map_or("".to_string(), |p| p.as_str().to_string());
             let node_type = cap.get(3).map_or("".to_string(), |p| p.as_str().to_string());
             let node_para = cap.get(4).map_or("".to_string(), |p| p.as_str().to_string());
-            self.flow_graph.add_node(node_id.clone());
-            
+
+            self.tf.add_node(node_id.clone());
             self.register(node_id, node_type, node_name, node_para);
         }
 
@@ -76,17 +76,13 @@ impl StepParser {
             let target = cap.get(3).map_or("".to_string(), |p| p.as_str().to_string());
 
             if let (Some(src_idx), Some(dst_idx)) = (
-                self.flow_graph
-                    .node_indices()
-                    .find(|i| self.flow_graph[*i] == source),
-                self.flow_graph
-                    .node_indices()
-                    .find(|i| self.flow_graph[*i] == target),
+                self.tf.node_indices().find(|i| self.tf[*i] == source),
+                self.tf.node_indices().find(|i| self.tf[*i] == target),
             ) {
-                self.flow_graph
-                    .add_edge(src_idx, dst_idx, decide);
+                self.tf.add_edge(src_idx, dst_idx, decide);
             }
         }
+        
         Ok(())
     }
 }
@@ -108,9 +104,9 @@ impl Executor {
     fn execute_flow(&mut self) -> Result<(), Box<dyn Error>> {
         let mut executed_steps: HashSet<String> = HashSet::new();
 
-        for node_index in self.parser.flow_graph.node_indices() {
-            let node_id = self.parser.flow_graph[node_index].clone();
-            if let Some(task) = self.parser.task_definitions.get(&node_id) {
+        for node_index in self.parser.tf.node_indices() {
+            let node_id = self.parser.tf[node_index].clone();
+            if let Some(task) = self.parser.td.get(&node_id) {
                 let result = task.execute(&mut self.workspace);
                 if let ExecutionResult::Success = result {
                     executed_steps.insert(node_id);
