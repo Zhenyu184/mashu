@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::error::Error;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 use petgraph::graph::{DiGraph, NodeIndex};
 
 use crate::task::{
@@ -101,6 +101,26 @@ impl Executor {
         }
     }
 
+    fn _navigate_next_task(&self, node: NodeIndex, result: &str, queue: &mut VecDeque<NodeIndex>) {
+        for neighbor in self.parser.tf.neighbors_directed(node, petgraph::Direction::Outgoing) {
+            if let Some(edge) = self.parser.tf.find_edge(node, neighbor) {
+                if self.parser.tf.edge_weight(edge) == Some(&result.to_string()) {
+                    queue.push_back(neighbor);
+                    break;
+                }
+            }
+        }
+    }
+
+    fn _result_handle(&self, node: NodeIndex, result: ExecutionResult, queue: &mut VecDeque<NodeIndex>) {
+        match result {
+            ExecutionResult::Success => self._navigate_next_task(node, "success", queue),
+            ExecutionResult::Failure => self._navigate_next_task(node, "fail", queue),
+            ExecutionResult::Skipped => self._navigate_next_task(node, "skip", queue),
+            _ => {}
+        }
+    }
+
     fn execute_flow(&mut self) -> Result<(), Box<dyn Error>> {
         let mut queue = VecDeque::new();
 
@@ -113,21 +133,10 @@ impl Executor {
 
         while let Some(curr) = queue.pop_front() {
             let node_id = self.parser.tf[curr].clone();
-
+        
             if let Some(task) = self.parser.td.get(&node_id) {
                 let result = task.execute(&mut self.workspace);
-
-                if let ExecutionResult::Success = result {
-                    for neighbor in self.parser.tf.neighbors_directed(curr, petgraph::Direction::Outgoing) {
-                        if let Some(edge) = self.parser.tf.find_edge(curr, neighbor) {
-                            if let Some(decide) = self.parser.tf.edge_weight(edge) {
-                                if decide == "success" {
-                                    queue.push_back(neighbor);
-                                }
-                            }
-                        }
-                    }
-                }
+                self._result_handle(curr, result, &mut queue);
             }
         }
 
