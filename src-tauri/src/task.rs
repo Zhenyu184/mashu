@@ -225,7 +225,21 @@ impl OpenWebTack {
 impl Task for OpenWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run open web"));
-        ExecutionResult::Success
+
+        let driver = match ws.get_web_driver() {
+            Some(driver) => driver,
+            None => return ExecutionResult::Failure,
+        };
+
+        let rt = Runtime::new().expect("create runtime fail");
+        match rt.block_on(async {
+            driver.goto(&self.url).await?;
+            driver.maximize_window().await?;
+            Ok::<(), WebDriverError>(())
+        }) {
+            Ok(_) => ExecutionResult::Success,
+            Err(_) => ExecutionResult::Failure,
+        }
     }
 }
 

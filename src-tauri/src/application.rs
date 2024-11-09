@@ -48,45 +48,36 @@ impl StepParser {
             ("control", "end") => Box::new(EndTack::new()),
             ("control", "sleep") => {
                 let ms = self.arg_parse(&node_para, "ms")
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(0u64);
-                Box::new(SleepTack::new(Some(ms)))
+                    .and_then(|v| v.parse::<u64>().ok());
+                Box::new(SleepTack::new(ms))
             },
             ("control", "timing") => {
-                let cron = self.arg_parse(&node_para, "cron")
-                    .unwrap_or("* * * * *".to_string());
-                Box::new(TimingTack::new(Some(&cron)))
+                let cron = self.arg_parse(&node_para, "cron");
+                Box::new(TimingTack::new(cron.as_deref()))
             },
             ("operate", "init_web") => {
-                let url = self.arg_parse(&node_para, "url")
-                    .unwrap_or("http://localhost:9515".to_string());
-                Box::new(InitWebTack::new(Some(&url)))
+                let url = self.arg_parse(&node_para, "url");
+                Box::new(InitWebTack::new(url.as_deref()))
             },
             ("operate", "open_web") => {
-                let url = self.arg_parse(&node_para, "url")
-                    .unwrap_or("www.wikipedia.org/wiki/Red_panda".to_string());
-                Box::new(OpenWebTack::new(Some(&url)))
+                let url = self.arg_parse(&node_para, "url");
+                Box::new(OpenWebTack::new(url.as_deref()))
             },
             ("operate", "input_string") => {
-                let component = self.arg_parse(&node_para, "component")
-                    .unwrap_or("".to_string());
-                let input = self.arg_parse(&node_para, "input")
-                    .unwrap_or("red panda".to_string());
-                Box::new(InputStringTack::new(Some(&component), Some(&input)))
+                let component = self.arg_parse(&node_para, "component");
+                let input = self.arg_parse(&node_para, "input");
+                Box::new(InputStringTack::new(component.as_deref(), input.as_deref()))
             },
             ("operate", "press_button") => {
-                let component = self.arg_parse(&node_para, "component")
-                    .unwrap_or("".to_string());
-                Box::new(PressButtonTack::new(Some(&component)))
+                let component = self.arg_parse(&node_para, "component");
+                Box::new(PressButtonTack::new(component.as_deref()))
             },
             ("decorate", "delay") => {
                 let f_time = self.arg_parse(&node_para, "front_time")
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(0u64);
+                    .and_then(|v| v.parse::<u64>().ok());
                 let b_time = self.arg_parse(&node_para, "back_time")
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(0u64);
-                Box::new(DelayTack::new(Some(f_time), Some(b_time)))
+                    .and_then(|v| v.parse::<u64>().ok());
+                Box::new(DelayTack::new(f_time, b_time))
             },
             ("decorate", "concurrent") => {
                 Box::new(ConcurrentTack::new())
