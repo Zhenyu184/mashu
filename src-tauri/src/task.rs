@@ -1,5 +1,6 @@
-use std::collections::HashMap;
 use thirtyfour::prelude::*;
+use std::collections::HashMap;
+use std::{thread, time::Duration};
 
 #[derive(Debug)]
 pub enum ExecutionResult {
@@ -9,13 +10,21 @@ pub enum ExecutionResult {
 }
 
 #[derive(Debug, Default)]
-pub struct TaskWorkspace {
+pub struct Workspace {
+    pub id: String,
     pub variables: HashMap<String, String>,
     pub execution_log: Vec<String>,
     pub web_driver: Option<WebDriver>,
 }
 
-impl TaskWorkspace {
+impl Workspace {
+    pub fn new(id: &str) -> Self {
+        Self {
+            id: id.to_string(),
+            ..Default::default()
+        }
+    }
+
     pub fn set_variable(&mut self, key: &str, value: &str) {
         self.variables.insert(key.to_string(), value.to_string());
     }
@@ -54,12 +63,11 @@ impl BaseTask {
 }
 
 pub trait Task {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult;
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult;
 }
 
 impl Task for BaseTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing BaseTask task, type: {} name: {}", self.task_type, self.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ExecutionResult::Success
     }
 }
@@ -76,13 +84,6 @@ impl ControlTask {
     }
 }
 
-impl Task for ControlTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Task: {}", self.base.task_name));
-        ExecutionResult::Success
-    }
-}
-
 pub struct HeadTack {
     base: ControlTask,
 }
@@ -96,8 +97,8 @@ impl HeadTack {
 }
 
 impl Task for HeadTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Head Tack: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run head"));
         ExecutionResult::Success
     }
 }
@@ -115,19 +116,19 @@ impl EndTack {
 }
 
 impl Task for EndTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control End Tack: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run end"));
         ExecutionResult::Success
     }
 }
 
 pub struct SleepTack {
     base: ControlTask,
-    time: u128
+    time: u64
 }
 
 impl SleepTack {
-    pub fn new(millisecond: Option<u128>) -> Self {
+    pub fn new(millisecond: Option<u64>) -> Self {
         SleepTack {
             base: ControlTask::new("sleep"),
             time: millisecond.unwrap_or(1000),
@@ -136,8 +137,9 @@ impl SleepTack {
 }
 
 impl Task for SleepTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Sleep Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run sleep"));
+        thread::sleep(Duration::from_millis(self.time));
         ExecutionResult::Success
     }
 }
@@ -157,8 +159,8 @@ impl TimingTack {
 }
 
 impl Task for TimingTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Control Timing Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run timing"));
         ExecutionResult::Success
     }
 }
@@ -172,13 +174,6 @@ impl OperateTask {
         OperateTask {
             base: BaseTask::new(task_name, "operate"),
         }
-    }
-}
-
-impl Task for OperateTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Operate Task: {}", self.base.task_name));
-        ExecutionResult::Success
     }
 }
 
@@ -197,21 +192,23 @@ impl InitWebTack {
 use futures::executor;
 
 impl Task for InitWebTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run init web"));
         let browser = DesiredCapabilities::chrome();
 
-        match executor::block_on(WebDriver::new("http://localhost:64175", browser)) {
-            Ok(driver) => {
-                if workspace.set_web_driver(driver) {
-                    ExecutionResult::Success
-                } else {
-                    ExecutionResult::Failure
-                }
-            }
-            Err(e) => {
-                ExecutionResult::Failure
-            }
-        }
+        // match executor::block_on(WebDriver::new("http://localhost:64175", browser)) {
+        //     Ok(driver) => {
+        //         if ws.set_web_driver(driver) {
+        //             return ExecutionResult::Success;
+        //         } else {
+        //             return ExecutionResult::Failure;
+        //         }
+        //     }
+        //     Err(e) => {
+        //         return ExecutionResult::Failure;
+        //     }
+        // }
+        return ExecutionResult::Success
     }
 }
 
@@ -228,8 +225,8 @@ impl OpenWebTack {
 }
 
 impl Task for OpenWebTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing operate open web Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run open web"));
         ExecutionResult::Success
     }
 }
@@ -247,8 +244,8 @@ impl InputStringTack {
 }
 
 impl Task for InputStringTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing operate input string Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run input string"));
         ExecutionResult::Success
     }
 }
@@ -266,8 +263,8 @@ impl PressButtonTack {
 }
 
 impl Task for PressButtonTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing operate press button Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run press button"));
         ExecutionResult::Success
     }
 }
@@ -284,13 +281,6 @@ impl DecorateTask {
     }
 }
 
-impl Task for DecorateTask {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Decorate Task: {}", self.base.task_name));
-        ExecutionResult::Success
-    }
-}
-
 pub struct DelayTack {
     base: DecorateTask,
 }
@@ -304,8 +294,8 @@ impl DelayTack {
 }
 
 impl Task for DelayTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Decorate Delay Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run delay"));
         ExecutionResult::Success
     }
 }
@@ -323,8 +313,8 @@ impl ConcurrentTack {
 }
 
 impl Task for ConcurrentTack {
-    fn execute(&self, workspace: &mut TaskWorkspace) -> ExecutionResult {
-        workspace.log(&format!("Executing Decorate concurrent Task: {}", self.base.base.task_name));
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run concurrent"));
         ExecutionResult::Success
     }
 }
