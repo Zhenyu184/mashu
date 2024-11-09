@@ -92,10 +92,7 @@ impl StepParser {
             ("decorate", "concurrent") => {
                 Box::new(ConcurrentTack::new())
             },
-            _ => Box::new(BaseTask {
-                task_name: node_name,
-                task_type: node_type,
-            }),
+            _ => Box::new(BaseTask::new(&*node_type, &*node_name)),
         };
 
         self.td.insert(node_id, task);

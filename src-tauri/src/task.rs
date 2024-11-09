@@ -191,10 +191,18 @@ impl InitWebTack {
     }
 }
 
+use futures::executor;
+use tokio::runtime::Runtime;
+
 impl Task for InitWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run init web"));
-        return ExecutionResult::Success
+        let caps = DesiredCapabilities::chrome();
+        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
+        let result = runtime.block_on(async {
+            WebDriver::new("http://localhost:9516", caps).await
+        });
+        ExecutionResult::Success
     }
 }
 

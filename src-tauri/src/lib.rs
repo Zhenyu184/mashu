@@ -15,7 +15,7 @@ async fn get_web_page(url: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn run_workflow(script: &str) -> Result<String, String> {
+fn run_workflow(script: &str) -> Result<String, String> {
     match application::app(script) {
         Ok(_) => Ok("run success".to_string()),
         Err(e) => Err(format!("error: {}", e)),
