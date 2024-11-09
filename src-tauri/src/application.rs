@@ -21,10 +21,6 @@ use crate::task::{
     Workspace,
 };
 
-struct ArgParser {
-    pub ram: String,
-}
-
 struct StepParser {
     td: HashMap<String, Box<dyn Task>>, // td means task depositary
     tf: DiGraph<String, String>,        // tf means task flowchart
@@ -38,23 +34,22 @@ impl StepParser {
         }
     }
 
-    fn register_task(&mut self, k: &str, v: Box<dyn Task>) {
-        self.td.insert(k.to_string(), v);
+    fn arg_parse(&self, node_para: &str, key: &str) -> Option<String> {
+        let pattern = format!(r"{}:\s*([^,}}\s]+)", key);
+        let re = Regex::new(&pattern).ok()?;
+        re.captures(node_para)
+            .and_then(|cap| cap.get(1))
+            .map(|m| m.as_str().trim_matches('\'').to_string())
     }
 
     fn register(&mut self, node_id: String, node_type: String, node_name: String, node_para: String) {
         println!("name: {}, para: '{}'", node_name, node_para);
         let task: Box<dyn Task> = match (node_type.as_str(), node_name.as_str()) {
             ("control", "sleep") => {
-                let ms = if node_para.contains("ms:") {
-                    let re = Regex::new(r"ms:\s*(\d+)").unwrap();
-                    re.captures(&node_para)
-                        .and_then(|cap| cap.get(1))
-                        .and_then(|m| m.as_str().parse::<u64>().ok())
-                } else {
-                    None
-                };
-                Box::new(SleepTack::new(ms))
+                let ms = self.arg_parse(&node_para, "ms")
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(0u64);
+                Box::new(SleepTack::new(Some(ms)))
             },
             ("control", "head") => Box::new(HeadTack::new()),
             ("control", "end") => Box::new(EndTack::new()),
@@ -70,7 +65,8 @@ impl StepParser {
                 task_type: node_type,
             }),
         };
-        self.register_task(&node_id, task);
+
+        self.td.insert(node_id, task);
     }
 
     fn parse_script(&mut self, raw: &str) -> Result<(), Box<dyn Error>> {

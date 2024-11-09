@@ -189,25 +189,9 @@ impl InitWebTack {
     }
 }
 
-use futures::executor;
-
 impl Task for InitWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run init web"));
-        let browser = DesiredCapabilities::chrome();
-
-        // match executor::block_on(WebDriver::new("http://localhost:64175", browser)) {
-        //     Ok(driver) => {
-        //         if ws.set_web_driver(driver) {
-        //             return ExecutionResult::Success;
-        //         } else {
-        //             return ExecutionResult::Failure;
-        //         }
-        //     }
-        //     Err(e) => {
-        //         return ExecutionResult::Failure;
-        //     }
-        // }
         return ExecutionResult::Success
     }
 }
