@@ -131,7 +131,7 @@ impl SleepTack {
     pub fn new(millisecond: Option<u64>) -> Self {
         SleepTack {
             base: ControlTask::new("sleep"),
-            time: millisecond.unwrap_or(1000),
+            time: millisecond.unwrap_or(0u64),
         }
     }
 }
@@ -179,12 +179,14 @@ impl OperateTask {
 
 pub struct InitWebTack {
     base: OperateTask,
+    port: u16,
 }
 
 impl InitWebTack {
-    pub fn new() -> Self {
+    pub fn new(port: Option<u16>) -> Self {
         InitWebTack {
             base: OperateTask::new("init_web"),
+            port: port.unwrap_or(1915u16),
         }
     }
 }
@@ -198,12 +200,14 @@ impl Task for InitWebTack {
 
 pub struct OpenWebTack {
     base: OperateTask,
+    url: String,
 }
 
 impl OpenWebTack {
-    pub fn new() -> Self {
+    pub fn new(url: Option<&str>) -> Self {
         OpenWebTack {
             base: OperateTask::new("open_web"),
+            url: url.unwrap_or("www.wikipedia.org/wiki/Red_panda").to_string(),
         }
     }
 }
@@ -217,12 +221,16 @@ impl Task for OpenWebTack {
 
 pub struct InputStringTack {
     base: OperateTask,
+    component: String,
+    input: String,
 }
 
 impl InputStringTack {
-    pub fn new() -> Self {
+    pub fn new(comp: Option<&str>, input: Option<&str>) -> Self {
         InputStringTack {
             base: OperateTask::new("input_string"),
+            component: comp.unwrap_or("").to_string(),
+            input: input.unwrap_or("").to_string(),
         }
     }
 }
@@ -236,12 +244,14 @@ impl Task for InputStringTack {
 
 pub struct PressButtonTack {
     base: OperateTask,
+    component: String,
 }
 
 impl PressButtonTack {
-    pub fn new() -> Self {
+    pub fn new(comp: Option<&str>) -> Self {
         PressButtonTack {
             base: OperateTask::new("press_button"),
+            component: comp.unwrap_or("").to_string(),
         }
     }
 }
@@ -267,12 +277,16 @@ impl DecorateTask {
 
 pub struct DelayTack {
     base: DecorateTask,
+    front_time: u64,
+    back_time: u64,
 }
 
 impl DelayTack {
-    pub fn new() -> Self {
+    pub fn new(f_time: Option<u64>, b_time: Option<u64>) -> Self {
         DelayTack {
             base: DecorateTask::new("delay"),
+            front_time: f_time.unwrap_or(0u64),
+            back_time: b_time.unwrap_or(0u64),
         }
     }
 }

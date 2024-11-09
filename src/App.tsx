@@ -31,7 +31,7 @@ function App() {
                 ct001["name: head,  type: control"]
                 ct002["name: end,   type: control"]
                 ct003["name: sleep, type: control, para: { ms:5000 }"]
-                op001["name: init_web, type: operate, para: { url:"http://localhost:9515" }"]
+                op001["name: init_web, type: operate, para: { url:'http://localhost:9515' }"]
                 op002["name: open_web, type: operate, para: { url:'www.google.com' }"]
                 de001["name: concurrent,   type: decorate"] 
                 op003["name: input_string, type: operate, para: { component:'', input:'red panda' }"]
