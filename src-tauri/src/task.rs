@@ -1,4 +1,5 @@
 use thirtyfour::prelude::*;
+use tokio::runtime::Runtime;
 use std::collections::HashMap;
 use std::{thread, time::Duration};
 
@@ -191,18 +192,20 @@ impl InitWebTack {
     }
 }
 
-use futures::executor;
-use tokio::runtime::Runtime;
-
 impl Task for InitWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        ws.log(&format!("run init web"));
         let caps = DesiredCapabilities::chrome();
-        let runtime = Runtime::new().expect("Failed to create Tokio runtime");
-        let result = runtime.block_on(async {
+        let rt = Runtime::new().expect("create runtime fail");
+
+        match rt.block_on(async {
             WebDriver::new("http://localhost:9516", caps).await
-        });
-        ExecutionResult::Success
+        }) {
+            Ok(driver) => {
+                ws.set_web_driver(driver);
+                ExecutionResult::Success
+            },
+            Err(_) => ExecutionResult::Failure
+        }
     }
 }
 
