@@ -34,8 +34,8 @@ function App() {
                 op001["name: init_web, type: operate, para: { url:'http://localhost:9516' }"]
                 op002["name: open_web, type: operate, para: { url:'www.google.com' }"]
                 de001["name: concurrent,   type: decorate"] 
-                op003["name: input_string, type: operate, para: { component:'', input:'red panda' }"]
-                op004["name: input_string, type: operate, para: { component:'', input:'very cute' }"]
+                op003["name: input_string, type: operate, para: { component:'input', input:'red panda' }"]
+                op004["name: input_string, type: operate, para: { component:'input', input:'very cute' }"]
                 op005["name: press_button, type: operate, para: { component:'' }"]
 
                 ct001 -->|success| op001

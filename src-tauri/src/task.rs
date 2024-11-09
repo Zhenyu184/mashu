@@ -1,4 +1,5 @@
 use thirtyfour::prelude::*;
+use thirtyfour::error::WebDriverErrorInfo;
 use tokio::runtime::Runtime;
 use std::collections::HashMap;
 use std::{thread, time::Duration};
@@ -254,15 +255,39 @@ impl InputStringTack {
         InputStringTack {
             base: OperateTask::new("input_string"),
             component: comp.unwrap_or("").to_string(),
-            input: input.unwrap_or("").to_string(),
+            input: input.unwrap_or("mashu").to_string(),
         }
     }
 }
 
 impl Task for InputStringTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        ws.log(&format!("run input string"));
-        ExecutionResult::Success
+        let driver = match ws.get_web_driver() {
+            Some(driver) => driver,
+            None => return ExecutionResult::Failure,
+        };
+
+        let rt = Runtime::new().expect("create runtime fail");
+        match rt.block_on(async {
+            let element = if let Ok(e) = driver.find(By::Id(&self.component)).await {
+                e
+            } else if let Ok(e) = driver.find(By::Name(&self.component)).await {
+                e
+            } else if let Ok(e) = driver.find(By::Css(&self.component)).await {
+                e
+            } else {
+                return Err(WebDriverError::NoSuchElement(
+                    WebDriverErrorInfo::new("element not found".to_string())
+                ));
+            };
+            
+            element.clear().await?;
+            element.send_keys(&self.input).await?;
+            Ok::<(), WebDriverError>(())
+        }) {
+            Ok(_) => ExecutionResult::Success,
+            Err(_) => ExecutionResult::Failure,
+        }
     }
 }
 
@@ -283,7 +308,32 @@ impl PressButtonTack {
 impl Task for PressButtonTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run press button"));
-        ExecutionResult::Success
+        
+        let driver = match ws.get_web_driver() {
+            Some(driver) => driver,
+            None => return ExecutionResult::Failure,
+        };
+
+        let rt = Runtime::new().expect("create runtime fail");
+        match rt.block_on(async {
+            let element = if let Ok(e) = driver.find(By::Id(&self.component)).await {
+                e
+            } else if let Ok(e) = driver.find(By::Name(&self.component)).await {
+                e
+            } else if let Ok(e) = driver.find(By::Css(&self.component)).await {
+                e
+            } else {
+                return Err(WebDriverError::NoSuchElement(
+                    WebDriverErrorInfo::new("element not found".to_string())
+                ));
+            };
+            
+            element.click().await?;
+            Ok::<(), WebDriverError>(())
+        }) {
+            Ok(_) => ExecutionResult::Success,
+            Err(_) => ExecutionResult::Failure,
+        }
     }
 }
 

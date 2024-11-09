@@ -1,18 +1,5 @@
 use thirtyfour::prelude::*;
 
-// 初始化瀏覽器驅動
-pub async fn init_browser() -> WebDriverResult<WebDriver> {
-    let caps = DesiredCapabilities::chrome();
-    let driver = WebDriver::new("http://localhost:9515", caps).await?;
-    Ok(driver)
-}
-
-// 打开指定的 URL
-pub async fn open_web_2(driver: &WebDriver, url: &str) -> WebDriverResult<()> {
-    driver.goto(url).await?;
-    driver.maximize_window().await?;
-    Ok(())
-}
 
 // 處理網站橫幅 e.g. Cookie
 // 若存在橫幅則點擊拒絕按鈕
