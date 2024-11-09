@@ -180,31 +180,30 @@ impl OperateTask {
 
 pub struct InitWebTack {
     base: OperateTask,
-    port: u16,
+    url: String,
 }
 
 impl InitWebTack {
-    pub fn new(port: Option<u16>) -> Self {
+    pub fn new(url: Option<&str>) -> Self {
         InitWebTack {
             base: OperateTask::new("init_web"),
-            port: port.unwrap_or(1915u16),
+            url: url.unwrap_or("http://localhost:9515").to_string(),
         }
     }
 }
 
 impl Task for InitWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        let caps = DesiredCapabilities::chrome();
+        let cap = DesiredCapabilities::chrome();
         let rt = Runtime::new().expect("create runtime fail");
-
         match rt.block_on(async {
-            WebDriver::new("http://localhost:9516", caps).await
+            WebDriver::new(&self.url, cap).await
         }) {
             Ok(driver) => {
                 ws.set_web_driver(driver);
                 ExecutionResult::Success
             },
-            Err(_) => ExecutionResult::Failure
+            Err(_) => ExecutionResult::Failure,
         }
     }
 }

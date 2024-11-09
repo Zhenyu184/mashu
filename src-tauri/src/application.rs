@@ -58,10 +58,9 @@ impl StepParser {
                 Box::new(TimingTack::new(Some(&cron)))
             },
             ("operate", "init_web") => {
-                let port = self.arg_parse(&node_para, "port")
-                    .and_then(|v| v.parse::<u16>().ok())
-                    .unwrap_or(1915u16);
-                Box::new(InitWebTack::new(Some(port)))
+                let url = self.arg_parse(&node_para, "url")
+                    .unwrap_or("http://localhost:9515".to_string());
+                Box::new(InitWebTack::new(Some(&url)))
             },
             ("operate", "open_web") => {
                 let url = self.arg_parse(&node_para, "url")
