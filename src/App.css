@@ -45,6 +45,11 @@
     box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
+.button-container {
+    display: flex;
+    width: 100%;
+}
+
 .editor-space {
     flex: 1;
     padding: 0px;

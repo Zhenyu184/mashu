@@ -6,7 +6,7 @@ export const raw = `
         op002["name: open_web, type: operate, para: { url:'https://accounts.google.com/' }"]
         op003["name: input_string, type: operate, para: { component:'identifierId', input:'zzy1120126@gmail.com' }"]
         op004["name: press_button, type: operate, para: { component:'identifierNext' }"]
-        ct003["name: sleep, type: control, para: { ms:'10000' }"]
+        ct003["name: sleep, type: control, para: { ms:'1000' }"]
 
         ct001 -->|success| op001
         op001 -->|success| op002

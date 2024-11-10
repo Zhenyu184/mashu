@@ -10,8 +10,6 @@ import { useRete } from 'rete-react-plugin';
 function App() {
     const [greetMsg, setGreetMsg] = useState('');
     const [name, setName] = useState('');
-    const [url, setUrl] = useState('');
-    const [url2, setUrl2] = useState('');
 
     const [editor] = useRete(createEditor);
 
@@ -20,14 +18,9 @@ function App() {
         setGreetMsg(await invoke('greet', { name }));
     }
 
-    async function get_web_page() {
-        const body = (await invoke('get_web_page', { url })) as string;
-        setGreetMsg(body);
-    }
-
-    async function run_workflow() {
+    async function run_workflow(pluginPath: string) {
         try {
-            const { raw } = await import('../plugins/login_google.ts');
+            const { raw } = await import(pluginPath);
             const script: string = btoa(raw) as string;
             const body = (await invoke('run_workflow', { script })) as string;
             setGreetMsg(body);
@@ -36,12 +29,23 @@ function App() {
         }
     }
 
+    async function stop_workflow() {
+        setGreetMsg('the function has not been implemented yet');
+    }
+
+    async function clear_msg() {
+        setGreetMsg('');
+    }
+
     return (
         <main className='container'>
             <div className='sidebar'>
                 <h1>Welcome to Mashu</h1>
 
-                <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+                <p>
+                    The purpose of this project is to make web crawling tools graphical. Mashu is made in memory of a cute baby
+                    red panda.
+                </p>
 
                 <form
                     className='row form-spacing'
@@ -54,35 +58,17 @@ function App() {
                     <button type='submit'>Greet</button>
                 </form>
 
-                <form
-                    className='row form-spacing'
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        get_web_page();
-                    }}
-                >
-                    <input
-                        id='greet-input'
-                        onChange={(e) => setUrl(e.currentTarget.value)}
-                        placeholder='https://v2.tauri.app/'
-                    />
-                    <button type='submit'>get</button>
-                </form>
-
-                <form
-                    className='row form-spacing'
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        run_workflow();
-                    }}
-                >
-                    <input id='greet-input' onChange={(e) => setUrl2(e.currentTarget.value)} placeholder='www.google.com' />
-                    <button type='submit'>run</button>
-                </form>
-
-                <button type='button' onClick={() => setGreetMsg('')}>
-                    Clear
-                </button>
+                <div className='button-container'>
+                    <button type='button' onClick={(_) => run_workflow('../plugins/login_google.ts')}>
+                        Run
+                    </button>
+                    <button type='button' onClick={(_) => stop_workflow()}>
+                        Stop
+                    </button>
+                    <button type='button' onClick={(_) => clear_msg()}>
+                        Clear
+                    </button>
+                </div>
 
                 <p>{greetMsg}</p>
             </div>
