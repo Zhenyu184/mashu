@@ -132,13 +132,13 @@ struct Executor {
 }
 
 impl Executor {
-    fn new(script: &str) -> Self {
+    fn new(id: &str, script: &str) -> Self {
         let mut parser = StepParser::new();
         parser.parse_script(script).expect("parser fail");
         Executor {
             parser,
             queue: VecDeque::new(),
-            ws: Workspace::new("wp001"),
+            ws: Workspace::new(&format!("{}-{}", id, "ws01")),
         }
     }
 
@@ -199,7 +199,7 @@ impl Executor {
 }
 
 pub fn app(raw: &str) -> Result<(), Box<dyn Error>> {
-    let mut executor = Executor::new(&raw);
+    let mut executor = Executor::new("e1", &raw);
     executor.execute_flow()?;
     Ok(())
 }
