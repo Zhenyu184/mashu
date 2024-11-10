@@ -344,19 +344,9 @@ impl Task for PressButtonTack {
 
         let rt = Runtime::new().expect("create runtime fail");
         match rt.block_on(async {
-            let element = if let Ok(e) = driver.find(By::Id(&self.component)).await {
-                e
-            } else if let Ok(e) = driver.find(By::Name(&self.component)).await {
-                e
-            } else if let Ok(e) = driver.find(By::Css(&self.component)).await {
-                e
-            } else {
-                return Err(WebDriverError::NoSuchElement(
-                    WebDriverErrorInfo::new("element not found".to_string())
-                ));
-            };
-            
-            element.click().await?;
+            let button = task_helper::find_component(driver, &self.component).await?;
+            button.click().await?;
+
             Ok::<(), WebDriverError>(())
         }) {
             Ok(_) => ExecutionResult::Success,

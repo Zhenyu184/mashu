@@ -6,17 +6,19 @@ export const raw = `
         op002["name: open_web, type: operate, para: { url:'www.youtube.com' }"]
         op003["name: input_string, type: operate, para: { component:'search_query', input:'red panda' }"]
         op004["name: summit, type: operate, para: { component:'search_query' }"]
+        op005["name: press_button, type: operate, para: { component:'video-title' }"]
         ct003["name: sleep, type: control, para: { ms:'10000' }"]
 
         ct001 -->|success| op001
         op001 -->|success| op002
         op002 -->|success| op003
         op003 -->|success| op004
+        op004 -->|success| op005
 
         op001 -->|fail| ct002
         op002 -->|fail| ct002
         op003 -->|fail| ct003
 
-        op004 -->|always| ct003
+        op005 -->|always| ct003
         ct003 -->|always| ct002
 `;
