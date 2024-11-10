@@ -4,6 +4,8 @@ use tokio::runtime::Runtime;
 use std::collections::HashMap;
 use std::{thread, time::Duration};
 
+use crate::task_helper;
+
 #[derive(Debug)]
 pub enum ExecutionResult {
     Success,
@@ -280,19 +282,8 @@ impl Task for InputStringTack {
 
         let run = Runtime::new().expect("create runtime failed");
         let ret = run.block_on(async {
-            let component = match (
-                driver.find(By::Id(&self.component)).await,
-                driver.find(By::Name(&self.component)).await,
-                driver.find(By::Css(&self.component)).await,
-            ) {
-                (Ok(elem), _, _) | (_, Ok(elem), _) | (_, _, Ok(elem)) => elem,
-                (Err(_), Err(_), Err(_)) => {
-                    return Err(WebDriverError::NoSuchElement(
-                        WebDriverErrorInfo::new("component not found".to_string())
-                    ));
-                }
-            };
-            component.send_keys(&self.input).await?;
+            let input_box = task_helper::find_component(driver, &self.component).await?;
+            input_box.send_keys(&self.input).await?;
             Ok::<(), WebDriverError>(())
         });
 
@@ -376,18 +367,7 @@ impl Task for SummitTack {
 
         let run = Runtime::new().expect("create runtime failed");
         let ret = run.block_on(async {
-            let input_box = match (
-                driver.find(By::Id(&self.component)).await,
-                driver.find(By::Name(&self.component)).await,
-                driver.find(By::Css(&self.component)).await,
-            ) {
-                (Ok(elem), _, _) | (_, Ok(elem), _) | (_, _, Ok(elem)) => elem,
-                (Err(_), Err(_), Err(_)) => {
-                    return Err(WebDriverError::NoSuchElement(
-                        WebDriverErrorInfo::new("component not found".to_string())
-                    ));
-                }
-            };
+            let input_box = task_helper::find_component(driver, &self.component).await?;
             input_box.send_keys(Key::Enter).await?;
             Ok::<(), WebDriverError>(())
         });
