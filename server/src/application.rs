@@ -155,9 +155,8 @@ impl Executor {
     fn _result_handle(&mut self, node: NodeIndex, result: ExecutionResult) {
         match result {
             ExecutionResult::Success => self._navigate_next_task(node, "success"),
-            ExecutionResult::Failure => self._navigate_next_task(node, "fail"),
             ExecutionResult::Decorate => self._navigate_next_task(node, "decorate"),
-            _ => {}
+            _ => self._navigate_next_task(node, "fail"),
         }
     }
 

@@ -120,7 +120,17 @@ impl EndTack {
 
 impl Task for EndTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        ws.log(&format!("run end"));
+        ws.log("run end: cleaning workspace");
+        
+        if let Some(driver) = ws.web_driver.take() {
+            let run = Runtime::new().expect("create runtime fail");
+            let _ = run.block_on(async {
+                driver.quit().await
+            });
+        }
+        ws.web_driver = None;
+        ws.variables.clear();
+        ws.execution_log.clear();
         ExecutionResult::Success
     }
 }
