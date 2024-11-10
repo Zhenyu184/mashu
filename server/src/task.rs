@@ -230,10 +230,11 @@ impl InitWebTack {
 
 impl Task for InitWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        let cap = DesiredCapabilities::chrome();
+        // let caps = DesiredCapabilities::chrome();
+        let caps = DesiredCapabilities::firefox();
         let rt = Runtime::new().expect("create runtime fail");
         match rt.block_on(async {
-            WebDriver::new(&self.url, cap).await
+            WebDriver::new(&self.url, caps).await
         }) {
             Ok(driver) => {
                 ws.set_web_driver(driver);
