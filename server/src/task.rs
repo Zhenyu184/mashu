@@ -1,8 +1,11 @@
+use std::str::FromStr;
+use std::collections::HashMap;
+use std::{thread, time::Duration};
+use chrono::Utc;
+use cron::Schedule;
 use thirtyfour::prelude::*;
 use thirtyfour::error::WebDriverErrorInfo;
 use tokio::runtime::Runtime;
-use std::collections::HashMap;
-use std::{thread, time::Duration};
 
 use crate::task_helper;
 
@@ -168,14 +171,33 @@ impl TimingTack {
     pub fn new(cron: Option<&str>) -> Self {
         TimingTack {
             base: ControlTask::new("timing"),
-            cron: cron.unwrap_or("* * * * *").to_string(),
+            cron: cron.unwrap_or("* * * * * * *").to_string(),
         }
     }
 }
 
 impl Task for TimingTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        ws.log(&format!("run timing"));
+        ws.log(&format!("run timing: {}", self.cron));
+        let schedule = match Schedule::from_str(&self.cron) {
+            Ok(s) => s,
+            Err(_) => {
+                ws.log(&format!("invalid cron expression"));
+                return ExecutionResult::Failure;
+            }
+        };
+
+        let next_trigger_time = match schedule.upcoming(Utc).next() {
+            Some(time) => time,
+            None => {
+                ws.log("no next trigger time found");
+                return ExecutionResult::Failure;
+            }
+        };
+        
+        ws.log(&format!("now: {},sleeping until: {}", Utc::now(), next_trigger_time));
+        let duration = next_trigger_time - Utc::now();
+        thread::sleep(Duration::from_secs(duration.num_seconds() as u64));
         ExecutionResult::Success
     }
 }
