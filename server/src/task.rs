@@ -227,7 +227,6 @@ impl OpenWebTack {
 impl Task for OpenWebTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run open web"));
-
         let driver = match ws.get_web_driver() {
             Some(driver) => driver,
             None => return ExecutionResult::Failure,
@@ -263,7 +262,7 @@ impl InputStringTack {
 
 impl Task for InputStringTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        println!("input string: {}", self.input);
+        ws.log(&format!("input string"));
         let driver = match ws.get_web_driver() {
             Some(driver) => driver,
             None => return ExecutionResult::Failure,
@@ -293,21 +292,6 @@ impl Task for InputStringTack {
                 ExecutionResult::Success
             }
             Err(_) => ExecutionResult::Failure,
-        }
-    }
-}
-
-
-pub struct SummitSearchTack {
-    base: OperateTask,
-    component: String,
-}
-
-impl SummitSearchTack {
-    pub fn new(comp: Option<&str>) -> Self {
-        SummitSearchTack {
-            base: OperateTask::new("input_string"),
-            component: comp.unwrap_or("").to_string(),
         }
     }
 }
@@ -353,6 +337,56 @@ impl Task for PressButtonTack {
             Ok::<(), WebDriverError>(())
         }) {
             Ok(_) => ExecutionResult::Success,
+            Err(_) => ExecutionResult::Failure,
+        }
+    }
+}
+
+pub struct SummitTack {
+    base: OperateTask,
+    component: String,
+}
+
+impl SummitTack {
+    pub fn new(comp: Option<&str>) -> Self {
+        SummitTack {
+            base: OperateTask::new("input_string"),
+            component: comp.unwrap_or("").to_string(),
+        }
+    }
+}
+
+impl Task for SummitTack {
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log("summit search");
+        let driver = match ws.get_web_driver() {
+            Some(driver) => driver,
+            None => return ExecutionResult::Failure,
+        };
+
+        let run = Runtime::new().expect("create runtime failed");
+        let ret = run.block_on(async {
+            let input_box = match (
+                driver.find(By::Id(&self.component)).await,
+                driver.find(By::Name(&self.component)).await,
+                driver.find(By::Css(&self.component)).await,
+            ) {
+                (Ok(elem), _, _) | (_, Ok(elem), _) | (_, _, Ok(elem)) => elem,
+                (Err(_), Err(_), Err(_)) => {
+                    return Err(WebDriverError::NoSuchElement(
+                        WebDriverErrorInfo::new("component not found".to_string())
+                    ));
+                }
+            };
+            input_box.send_keys(Key::Enter).await?;
+            Ok::<(), WebDriverError>(())
+        });
+
+        match ret {
+            Ok(_) => {
+                ws.set_variable("last_option_component", &self.component);
+                ExecutionResult::Success
+            }
             Err(_) => ExecutionResult::Failure,
         }
     }

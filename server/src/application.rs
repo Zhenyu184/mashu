@@ -14,6 +14,7 @@ use crate::task::{
     InitWebTack,
     OpenWebTack,
     PressButtonTack,
+    SummitTack,
     InputStringTack,
     ExecutionResult,
     DelayTack,
@@ -71,6 +72,10 @@ impl StepParser {
             ("operate", "press_button") => {
                 let component = self.arg_parse(&node_para, "component");
                 Box::new(PressButtonTack::new(component.as_deref()))
+            },
+            ("operate", "summit") => {
+                let component = self.arg_parse(&node_para, "component");
+                Box::new(SummitTack::new(component.as_deref()))
             },
             ("decorate", "delay") => {
                 let f_time = self.arg_parse(&node_para, "front_time")
