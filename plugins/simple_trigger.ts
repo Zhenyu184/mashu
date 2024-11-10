@@ -2,7 +2,7 @@ export const raw = `
     flowchart TD
         ct001["name: head,  type: control"]
         ct002["name: end,   type: control"]
-        ct004["name: timing, type: control, para: { cron:'0 04 13 * * * *' }"]
+        ct004["name: timing, type: control, para: { cron:'0 32 21 * * * *' }"]
         ct003["name: sleep, type: control, para: { ms:'10000' }"]
         op001["name: init_web, type: operate, para: { url:'http://localhost:9515' }"]
         op002["name: open_web, type: operate, para: { url:'www.google.com' }"]

@@ -195,9 +195,9 @@ impl Task for TimingTack {
             }
         };
         
-        ws.log(&format!("now: {},sleeping until: {}", Utc::now(), next_trigger_time));
         let duration = next_trigger_time - Utc::now();
-        thread::sleep(Duration::from_secs(duration.num_seconds() as u64));
+        let offset_duration = duration.num_seconds().saturating_sub(8 * 60 * 60);
+        thread::sleep(Duration::from_secs(offset_duration as u64));
         ExecutionResult::Success
     }
 }
