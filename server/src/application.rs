@@ -142,16 +142,23 @@ impl Executor {
         }
     }
 
-    fn _navigate_next_task(&mut self, node: NodeIndex, result: &str) {
+    fn _navigate_next_task(&mut self, node: NodeIndex, goto: &str) {
         for neighbor in self.parser.tf.neighbors_directed(node, petgraph::Direction::Outgoing) {
-            if let Some(edge) = self.parser.tf.find_edge(node, neighbor) {
-                if self.parser.tf.edge_weight(edge) != Some(&result.to_string()) { continue; }
-                self.queue.push_back(neighbor);
-                break;
+            let edge = self.parser.tf.find_edge(node, neighbor);
+            if edge.is_none() {
+                continue;
             }
+
+            let edge = edge.unwrap(); 
+            if self.parser.tf.edge_weight(edge) != Some(&goto.to_string()) {
+                continue;
+            }
+            
+            self.queue.push_back(neighbor);
+            break;
         }
     }
-
+    
     fn _result_route(&mut self, node: NodeIndex, result: ExecutionResult) {
         let always_edge = self.parser.tf.neighbors(node).find(|neighbor| {
             self.parser.tf.find_edge(node, *neighbor)
