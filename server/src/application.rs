@@ -64,10 +64,8 @@ impl StepParser {
                 Box::new(OpenWebTack::new(url.as_deref()))
             },
             ("operate", "input_string") => {
-                println!("log 1: {}", node_para);
                 let component = self.arg_parse(&node_para, "component");
                 let input = self.arg_parse(&node_para, "input");
-                println!("log 2: {}", input.as_deref().unwrap_or("None"));
                 Box::new(InputStringTack::new(component.as_deref(), input.as_deref()))
             },
             ("operate", "press_button") => {

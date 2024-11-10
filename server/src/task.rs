@@ -46,8 +46,12 @@ impl Workspace {
 
     pub fn log(&mut self, message: &str) {
         self.execution_log.push(message.to_string());
-        println!("{}", message);
+        println!("[{}] {}",self.id, message);
     }
+}
+
+pub trait Task {
+    fn execute(&self, ws: &mut Workspace) -> ExecutionResult;
 }
 
 pub struct BaseTask {
@@ -64,12 +68,9 @@ impl BaseTask {
     }
 }
 
-pub trait Task {
-    fn execute(&self, ws: &mut Workspace) -> ExecutionResult;
-}
-
 impl Task for BaseTask {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        ws.log(&format!("run base task, name: {}, type: {}", self.task_name, self.task_type));
         ExecutionResult::Success
     }
 }
@@ -267,7 +268,7 @@ impl Task for InputStringTack {
             None => return ExecutionResult::Failure,
         };
 
-        println!("input: {}", self.input);
+        println!("input string: {}", self.input);
 
         let rt = Runtime::new().expect("create runtime fail");
         match rt.block_on(async {
