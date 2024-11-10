@@ -152,14 +152,24 @@ impl Executor {
         }
     }
 
-    fn _result_handle(&mut self, node: NodeIndex, result: ExecutionResult) {
-        match result {
-            ExecutionResult::Success => self._navigate_next_task(node, "success"),
-            ExecutionResult::Decorate => self._navigate_next_task(node, "decorate"),
-            _ => self._navigate_next_task(node, "fail"),
-        }
+    fn _result_route(&mut self, node: NodeIndex, result: ExecutionResult) {
+        let always_edge = self.parser.tf.neighbors(node).find(|neighbor| {
+            self.parser.tf.find_edge(node, *neighbor)
+                .and_then(|edge| self.parser.tf.edge_weight(edge))
+                .map_or(false, |weight| weight == "always")
+        });
+    
+        let target = always_edge.map_or_else(
+            || match result {
+                ExecutionResult::Success => "success",
+                ExecutionResult::Decorate => "decorate",
+                _ => "fail",
+            },
+            |_| "always",
+        );
+        self._navigate_next_task(node, target);
     }
-
+    
     fn execute_flow(&mut self) -> Result<(), Box<dyn Error>> {
         for i in self.parser.tf.node_indices() {
             if self.parser.tf.neighbors_directed(i, petgraph::Direction::Incoming).count() == 0 {
@@ -170,10 +180,11 @@ impl Executor {
 
         while let Some(curr) = self.queue.pop_front() {
             let node_id = self.parser.tf[curr].clone();
+            println!("run node id: {}", node_id);
         
             if let Some(task) = self.parser.td.get(&node_id) {
                 let result = task.execute(&mut self.ws);
-                self._result_handle(curr, result);
+                self._result_route(curr, result);
             }
         }
         Ok(())

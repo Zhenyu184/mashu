@@ -27,7 +27,7 @@ function App() {
 
     async function run_workflow() {
         try {
-            const { raw } = await import('../plugins/simple_google_search.ts');
+            const { raw } = await import('../plugins/simple_youtube_search.ts');
             const script: string = btoa(raw) as string;
             const body = (await invoke('run_workflow', { script })) as string;
             setGreetMsg(body);
