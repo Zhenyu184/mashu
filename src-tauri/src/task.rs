@@ -255,7 +255,7 @@ impl InputStringTack {
         InputStringTack {
             base: OperateTask::new("input_string"),
             component: comp.unwrap_or("").to_string(),
-            input: input.unwrap_or("mashu").to_string(),
+            input: input.unwrap_or("red panda").to_string(),
         }
     }
 }
@@ -266,6 +266,8 @@ impl Task for InputStringTack {
             Some(driver) => driver,
             None => return ExecutionResult::Failure,
         };
+
+        println!("input: {}", self.input);
 
         let rt = Runtime::new().expect("create runtime fail");
         match rt.block_on(async {

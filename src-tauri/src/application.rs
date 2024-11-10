@@ -35,7 +35,7 @@ impl StepParser {
     }
 
     fn arg_parse(&self, node_para: &str, key: &str) -> Option<String> {
-        let pattern = format!(r"{}:\s*([^,}}\s]+)", key);
+        let pattern = format!(r"{}:\s*'([^']*)'", key);
         let re = Regex::new(&pattern).ok()?;
         re.captures(node_para)
             .and_then(|cap| cap.get(1))
@@ -64,8 +64,10 @@ impl StepParser {
                 Box::new(OpenWebTack::new(url.as_deref()))
             },
             ("operate", "input_string") => {
+                println!("log 1: {}", node_para);
                 let component = self.arg_parse(&node_para, "component");
                 let input = self.arg_parse(&node_para, "input");
+                println!("log 2: {}", input.as_deref().unwrap_or("None"));
                 Box::new(InputStringTack::new(component.as_deref(), input.as_deref()))
             },
             ("operate", "press_button") => {

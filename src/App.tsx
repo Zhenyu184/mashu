@@ -30,28 +30,22 @@ function App() {
             flowchart TD
                 ct001["name: head,  type: control"]
                 ct002["name: end,   type: control"]
-                ct003["name: sleep, type: control, para: { ms:5000 }"]
-                op001["name: init_web, type: operate, para: { url:'http://localhost:9516' }"]
+                op001["name: init_web, type: operate, para: { url:'http://localhost:9515' }"]
                 op002["name: open_web, type: operate, para: { url:'www.google.com' }"]
-                de001["name: concurrent,   type: decorate"] 
-                op003["name: input_string, type: operate, para: { component:'input', input:'red panda' }"]
-                op004["name: input_string, type: operate, para: { component:'input', input:'very cute' }"]
-                op005["name: press_button, type: operate, para: { component:'' }"]
+                op003["name: input_string, type: operate, para: { component:'q', input:'red panda' }"]
+                op004["name: press_button, type: operate, para: { component:'q' }"]
+                ct003["name: sleep, type: control, para: { ms:'10000' }"]
 
                 ct001 -->|success| op001
                 op001 -->|success| op002
-                op002 -->|success| de001
-                op005 -->|success| ct003
+                op002 -->|success| op003
+                op003 -->|success| op004
+                op004 -->|success| ct003
                 ct003 -->|success| ct002
-                de001 -->|success| op005
 
                 op001 -->|fail| ct002
                 op002 -->|fail| ct002
-                op005 -->|fail| ct002
-                de001 -->|fail| ct002
-
-                de001 -->|decorate| op003
-                de001 -->|decorate| op004
+                op004 -->|fail| ct002
         `;
 
         try {
