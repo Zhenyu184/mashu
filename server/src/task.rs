@@ -263,33 +263,51 @@ impl InputStringTack {
 
 impl Task for InputStringTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
+        println!("input string: {}", self.input);
         let driver = match ws.get_web_driver() {
             Some(driver) => driver,
             None => return ExecutionResult::Failure,
         };
 
-        println!("input string: {}", self.input);
-
-        let rt = Runtime::new().expect("create runtime fail");
-        match rt.block_on(async {
-            let element = if let Ok(e) = driver.find(By::Id(&self.component)).await {
-                e
-            } else if let Ok(e) = driver.find(By::Name(&self.component)).await {
-                e
-            } else if let Ok(e) = driver.find(By::Css(&self.component)).await {
-                e
-            } else {
-                return Err(WebDriverError::NoSuchElement(
-                    WebDriverErrorInfo::new("element not found".to_string())
-                ));
+        let run = Runtime::new().expect("create runtime failed");
+        let ret = run.block_on(async {
+            let component = match (
+                driver.find(By::Id(&self.component)).await,
+                driver.find(By::Name(&self.component)).await,
+                driver.find(By::Css(&self.component)).await,
+            ) {
+                (Ok(elem), _, _) | (_, Ok(elem), _) | (_, _, Ok(elem)) => elem,
+                (Err(_), Err(_), Err(_)) => {
+                    return Err(WebDriverError::NoSuchElement(
+                        WebDriverErrorInfo::new("component not found".to_string())
+                    ));
+                }
             };
-            
-            element.clear().await?;
-            element.send_keys(&self.input).await?;
+            component.send_keys(&self.input).await?;
             Ok::<(), WebDriverError>(())
-        }) {
-            Ok(_) => ExecutionResult::Success,
+        });
+
+        match ret {
+            Ok(_) => {
+                ws.set_variable("last_option_component", &self.component);
+                ExecutionResult::Success
+            }
             Err(_) => ExecutionResult::Failure,
+        }
+    }
+}
+
+
+pub struct SummitSearchTack {
+    base: OperateTask,
+    component: String,
+}
+
+impl SummitSearchTack {
+    pub fn new(comp: Option<&str>) -> Self {
+        SummitSearchTack {
+            base: OperateTask::new("input_string"),
+            component: comp.unwrap_or("").to_string(),
         }
     }
 }
