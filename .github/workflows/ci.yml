@@ -29,6 +29,7 @@ jobs:
                       libgdk-pixbuf2.0-dev \
                       libglib2.0-dev \
                       libjavascriptcoregtk-4.0-dev \
+                      libwebkit2gtk-4.1-dev \
                       libsoup-3.0-dev
 
             - name: Install pnpm
