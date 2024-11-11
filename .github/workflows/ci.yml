@@ -1,49 +1,67 @@
-name: CI/CD
+name: 'publish'
 
 on:
+    workflow_dispatch:
     push:
         branches:
-            - main # trigger
-    pull_request:
-        branches:
-            - main # trigger when PR
+            - release
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+    publish-tauri:
+        permissions:
+            contents: write
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - platform: 'macos-latest' # for Arm based macs (M1 and above).
+                      args: '--target aarch64-apple-darwin'
+                    - platform: 'macos-latest' # for Intel based macs.
+                      args: '--target x86_64-apple-darwin'
+                    - platform: 'ubuntu-22.04'
+                      args: ''
+                    - platform: 'windows-latest'
+                      args: ''
 
+        runs-on: ${{ matrix.platform }}
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v2
-              with:
-                  node-version: '20' # node.js version
-
-            - name: Install system dependencies
+            - name: Install dependencies (Ubuntu only)
+              if: matrix.platform == 'ubuntu-22.04'
               run: |
                   sudo apt-get update
-                  sudo apt-get install -y \
-                      libgtk-3-dev \
-                      libgdk-pixbuf2.0-dev \
-                      libglib2.0-dev \
-                      libjavascriptcoregtk-4.0-dev \
-                      libwebkit2gtk-4.1-dev
+                  sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libsoup2.4-dev libgtk-3-dev libgdk-pixbuf2.0-dev libglib2.0-dev libjavascriptcoregtk-4.0-dev
 
-            - name: Install pnpm
-              run: npm install -g pnpm
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 'lts/*'
+                  cache: 'pnpm' # Set this to npm, yarn, or pnpm.
 
-            - name: Install dependencies
-              run: pnpm install
+            - name: Install Rust stable
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-            # - name: Run tests
-            #   run: pnpm test
+            - name: Rust cache
+              uses: swatinem/rust-cache@v2
+              with:
+                  workspaces: './src-tauri -> target'
 
-            # - name: Build project
-            #   run: pnpm run build
+            - name: Install frontend dependencies
+              run: pnpm install # Change this to npm or yarn depending on which one you use.
 
-            - name: Deploy
-              run: |
-                  echo "Deploying to production..."
-                  pnpm run tauri dev # Use pnpm to run the tauri command
+            - name: Build Tauri app
+              run: pnpm run tauri build # Ensure you build the Tauri app before publishing.
+
+            - uses: tauri-apps/tauri-action@v0
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tagName: app-v__VERSION__ # The action automatically replaces __VERSION__ with the app version.
+                  releaseName: 'App v__VERSION__'
+                  releaseBody: 'See the assets to download this version and install.'
+                  releaseDraft: true
+                  prerelease: false
+                  args: ${{ matrix.args }}
