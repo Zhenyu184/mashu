@@ -4,7 +4,10 @@ on:
     workflow_dispatch:
     push:
         branches:
-            - release
+            - main
+    pull_request:
+        branches:
+            - main
 
 jobs:
     publish-tauri:
