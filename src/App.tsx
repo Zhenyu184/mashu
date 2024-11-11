@@ -59,7 +59,7 @@ function App() {
                 </form>
 
                 <div className='button-container'>
-                    <button type='button' onClick={(_) => run_workflow('../plugins/login_google.ts')}>
+                    <button type='button' onClick={(_) => run_workflow('../plugins/simple_google_search.ts')}>
                         Run
                     </button>
                     <button type='button' onClick={(_) => stop_workflow()}>

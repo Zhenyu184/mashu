@@ -7,13 +7,9 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { DataflowEngine } from 'rete-engine';
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 
-import { invoke } from '@tauri-apps/api/core';
+import './editor.css';
 
 const socket = new ClassicPreset.Socket('socket');
-
-async function request_f() {
-    await invoke('request', { 'https://www.rust-lang.org': String});
-}
 
 class RequestNode extends ClassicPreset.Node<
     {},
@@ -34,7 +30,6 @@ class RequestNode extends ClassicPreset.Node<
     }
 
     job() {
-        request_f()
         return;
     }
 }
@@ -55,6 +50,56 @@ class NumberNode extends ClassicPreset.Node<
 
     data(): { value: number } {
         return { value: this.controls.value.value || 0 };
+    }
+}
+
+class SampleNode extends ClassicPreset.Node<
+    { left: ClassicPreset.Socket; right: ClassicPreset.Socket },
+    { value: ClassicPreset.Socket },
+    { value: ClassicPreset.InputControl<'number'> }
+> {
+    height = 220;
+    width = 200;
+
+    constructor(change?: () => void, private update?: (control: ClassicPreset.InputControl<'number'>) => void) {
+        super('Add');
+        const left = new ClassicPreset.Input(socket, 'Left');
+        const right = new ClassicPreset.Input(socket, 'Right');
+
+        left.addControl(new ClassicPreset.InputControl('number', { initial: 0, change }));
+        right.addControl(new ClassicPreset.InputControl('number', { initial: 0, change }));
+
+        this.addInput('left', left);
+        this.addInput('right', right);
+        this.addControl(
+            'value',
+            new ClassicPreset.InputControl('number', {
+                readonly: true,
+            })
+        );
+        this.addOutput('value', new ClassicPreset.Output(socket, 'Number'));
+    }
+
+    data(inputs: { left?: number[]; right?: number[] }): { value: number } {
+        const leftControl = this.inputs.left?.control as ClassicPreset.InputControl<'number'>;
+        const rightControl = this.inputs.right?.control as ClassicPreset.InputControl<'number'>;
+
+        const { left, right } = inputs;
+        const leftInputData = left ? left[0] : leftControl.value || 0;
+        const rightInputData = right ? right[0] : rightControl.value || 0;
+
+        const value = this.job(leftInputData, rightInputData);
+
+        this.controls.value.setValue(value);
+        if (this.update) {
+            this.update(this.controls.value);
+        }
+
+        return { value };
+    }
+
+    job(a?: number, b?: number) {
+        return (a || 0) + (b || 0);
     }
 }
 
@@ -110,7 +155,7 @@ class AddNode extends ClassicPreset.Node<
 
 class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
 
-type Node = NumberNode | AddNode | RequestNode;
+type Node = NumberNode | AddNode | RequestNode | SampleNode;
 type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
 type Schemes = GetSchemes<Node, ConnProps>;
 
@@ -126,17 +171,26 @@ export async function createEditor(container: HTMLElement) {
 
     function process() {
         engine.reset();
-
         editor
             .getNodes()
             .filter((n) => n instanceof AddNode)
             .forEach((n) => engine.fetch(n.id));
     }
 
+    function process2() {
+        engine.reset();
+        editor
+            .getNodes()
+            .filter((n) => n instanceof SampleNode)
+            .forEach((n) => engine.fetch(n.id));
+    }
+
+    // 更新上下文菜单
     const contextMenu = new ContextMenuPlugin<Schemes>({
         items: ContextMenuPresets.classic.setup([
             ['Number', () => new NumberNode(0, process)],
             ['Add', () => new AddNode(process, (c) => area.update('control', c.id))],
+            ['SampleNode', () => new SampleNode(process2, (c) => area.update('control', c.id))]
         ]),
     });
     area.use(contextMenu);
