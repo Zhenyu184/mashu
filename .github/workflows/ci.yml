@@ -3,10 +3,10 @@ name: CI/CD
 on:
     push:
         branches:
-            - main # trigger
+            - '*' 
     pull_request:
         branches:
-            - main # trigger when PR
+            - '*' 
 
 jobs:
     build:
