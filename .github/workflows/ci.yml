@@ -29,7 +29,7 @@ jobs:
                       libgdk-pixbuf2.0-dev \
                       libglib2.0-dev \
                       libjavascriptcoregtk-4.0-dev \
-                      libsoup2.4-dev
+                      libsoup-3.0-dev
 
             - name: Install pnpm
               run: npm install -g pnpm
