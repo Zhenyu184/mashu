@@ -34,4 +34,4 @@ jobs:
               run: |
                   # run
                   echo "deploying to production..."
-                  pnpm tauri dev
+                  npm tauri dev
