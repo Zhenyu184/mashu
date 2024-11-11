@@ -55,7 +55,7 @@ jobs:
               run: pnpm install # change this to npm or pnpm depending on which one you use.
 
             - name: Build Tauri app
-              run: pnpm tauri dev #
+              run: pnpm tauri build #
 
 
             # - uses: tauri-apps/tauri-action@v0
