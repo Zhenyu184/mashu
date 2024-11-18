@@ -7,8 +7,6 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { DataflowEngine } from 'rete-engine';
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 
-import './editor.css';
-
 const socket = new ClassicPreset.Socket('socket');
 
 class RequestNode extends ClassicPreset.Node<

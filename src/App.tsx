@@ -5,12 +5,12 @@ import { invoke } from '@tauri-apps/api/core';
 // rete.js
 import { createEditor } from './editor';
 import { useRete } from 'rete-react-plugin';
+import styles from './Editor.module.css';
 
 function App() {
     const [greetMsg, setGreetMsg] = useState('');
-    const [name, setName] = useState('');
-
     const [editor] = useRete(createEditor);
+    const [name, setName] = useState('');
 
     async function greet() {
         setGreetMsg(await invoke('greet', { name }));
@@ -70,9 +70,8 @@ function App() {
 
                 <p>{greetMsg}</p>
             </div>
-
-            <div className='editor-space'>
-                <div ref={editor} className='rete' style={{ height: '100%', width: '100%' }}></div>
+            <div className={styles.editorSpace}>
+                <div ref={editor} className={styles.rete}></div>
             </div>
         </main>
     );
