@@ -230,7 +230,6 @@ export async function createEditor(container: HTMLElement) {
 
     const con1 = new Connection(a, 'value', c, 'left');
     const con2 = new Connection(b, 'value', c, 'right');
-    const con3 = new Connection(d, 'value', c, 'right');
 
     await editor.addNode(a);
     await editor.addNode(b);
