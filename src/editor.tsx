@@ -32,48 +32,6 @@ class RequestNode extends ClassicPreset.Node<
     }
 }
 
-class HeadNode extends ClassicPreset.Node<{}, { success: ClassicPreset.Socket }> {
-    height = 80;
-    width = 200;
-
-    constructor() {
-        super('HeadNode');
-        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
-    }
-}
-
-class EndNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, {}> {
-    height = 80;
-    width = 200;
-
-    constructor() {
-        super('EndNode');
-        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
-    }
-}
-
-class SleepNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, { success: ClassicPreset.Socket }> {
-    height = 80;
-    width = 200;
-
-    constructor() {
-        super('SleepNode');
-        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
-        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
-    }
-}
-
-class TimingNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, { success: ClassicPreset.Socket }> {
-    height = 80;
-    width = 200;
-
-    constructor() {
-        super('TimingNode');
-        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
-        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
-    }
-}
-
 class NumberNode extends ClassicPreset.Node<
     {},
     { value: ClassicPreset.Socket },
@@ -90,56 +48,6 @@ class NumberNode extends ClassicPreset.Node<
 
     data(): { value: number } {
         return { value: this.controls.value.value || 0 };
-    }
-}
-
-class SampleNode extends ClassicPreset.Node<
-    { left: ClassicPreset.Socket; right: ClassicPreset.Socket },
-    { value: ClassicPreset.Socket },
-    { value: ClassicPreset.InputControl<'number'> }
-> {
-    height = 220;
-    width = 200;
-
-    constructor(change?: () => void, private update?: (control: ClassicPreset.InputControl<'number'>) => void) {
-        super('Add');
-        const left = new ClassicPreset.Input(socket, 'Left');
-        const right = new ClassicPreset.Input(socket, 'Right');
-
-        left.addControl(new ClassicPreset.InputControl('number', { initial: 0, change }));
-        right.addControl(new ClassicPreset.InputControl('number', { initial: 0, change }));
-
-        this.addInput('left', left);
-        this.addInput('right', right);
-        this.addControl(
-            'value',
-            new ClassicPreset.InputControl('number', {
-                readonly: true,
-            })
-        );
-        this.addOutput('value', new ClassicPreset.Output(socket, 'Number'));
-    }
-
-    data(inputs: { left?: number[]; right?: number[] }): { value: number } {
-        const leftControl = this.inputs.left?.control as ClassicPreset.InputControl<'number'>;
-        const rightControl = this.inputs.right?.control as ClassicPreset.InputControl<'number'>;
-
-        const { left, right } = inputs;
-        const leftInputData = left ? left[0] : leftControl.value || 0;
-        const rightInputData = right ? right[0] : rightControl.value || 0;
-
-        const value = this.job(leftInputData, rightInputData);
-
-        this.controls.value.setValue(value);
-        if (this.update) {
-            this.update(this.controls.value);
-        }
-
-        return { value };
-    }
-
-    job(a?: number, b?: number) {
-        return (a || 0) + (b || 0);
     }
 }
 
@@ -193,9 +101,9 @@ class AddNode extends ClassicPreset.Node<
     }
 }
 
+import { HeadNode, EndNode, SleepNode, TimingNode, InitWebNode, OpenWebNode } from './node';
+type Node = NumberNode | AddNode | RequestNode | HeadNode | EndNode | SleepNode | TimingNode | InitWebNode | OpenWebNode;
 class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
-
-type Node = NumberNode | AddNode | RequestNode | SampleNode | HeadNode | EndNode | SleepNode | TimingNode;
 type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
 type Schemes = GetSchemes<Node, ConnProps>;
 
@@ -217,23 +125,16 @@ export async function createEditor(container: HTMLElement) {
             .forEach((n) => engine.fetch(n.id));
     }
 
-    function process2() {
-        engine.reset();
-        editor
-            .getNodes()
-            .filter((n) => n instanceof SampleNode)
-            .forEach((n) => engine.fetch(n.id));
-    }
-
     const contextMenu = new ContextMenuPlugin<Schemes>({
         items: ContextMenuPresets.classic.setup([
             ['HeadNode', () => new HeadNode()],
             ['EndNode', () => new EndNode()],
             ['SleepNode', () => new SleepNode()],
             ['TimingNode', () => new TimingNode()],
+            ['InitWebNode', () => new InitWebNode()],
+            ['OpenWebNode', () => new OpenWebNode()],
             ['Number', () => new NumberNode(0, process)],
             ['Add', () => new AddNode(process, (c) => area.update('control', c.id))],
-            ['SampleNode', () => new SampleNode(process2, (c) => area.update('control', c.id))],
         ]),
     });
     area.use(contextMenu);
