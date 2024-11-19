@@ -32,6 +32,48 @@ class RequestNode extends ClassicPreset.Node<
     }
 }
 
+class HeadNode extends ClassicPreset.Node<{}, { success: ClassicPreset.Socket }> {
+    height = 80;
+    width = 200;
+
+    constructor() {
+        super('HeadNode');
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+    }
+}
+
+class EndNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, {}> {
+    height = 80;
+    width = 200;
+
+    constructor() {
+        super('EndNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+    }
+}
+
+class SleepNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, { success: ClassicPreset.Socket }> {
+    height = 80;
+    width = 200;
+
+    constructor() {
+        super('SleepNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+    }
+}
+
+class TimingNode extends ClassicPreset.Node<{ entry: ClassicPreset.Socket }, { success: ClassicPreset.Socket }> {
+    height = 80;
+    width = 200;
+
+    constructor() {
+        super('TimingNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+    }
+}
+
 class NumberNode extends ClassicPreset.Node<
     {},
     { value: ClassicPreset.Socket },
@@ -153,7 +195,7 @@ class AddNode extends ClassicPreset.Node<
 
 class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
 
-type Node = NumberNode | AddNode | RequestNode | SampleNode;
+type Node = NumberNode | AddNode | RequestNode | SampleNode | HeadNode | EndNode | SleepNode | TimingNode;
 type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
 type Schemes = GetSchemes<Node, ConnProps>;
 
@@ -183,12 +225,15 @@ export async function createEditor(container: HTMLElement) {
             .forEach((n) => engine.fetch(n.id));
     }
 
-    // 更新上下文菜单
     const contextMenu = new ContextMenuPlugin<Schemes>({
         items: ContextMenuPresets.classic.setup([
+            ['HeadNode', () => new HeadNode()],
+            ['EndNode', () => new EndNode()],
+            ['SleepNode', () => new SleepNode()],
+            ['TimingNode', () => new TimingNode()],
             ['Number', () => new NumberNode(0, process)],
             ['Add', () => new AddNode(process, (c) => area.update('control', c.id))],
-            ['SampleNode', () => new SampleNode(process2, (c) => area.update('control', c.id))]
+            ['SampleNode', () => new SampleNode(process2, (c) => area.update('control', c.id))],
         ]),
     });
     area.use(contextMenu);
@@ -240,5 +285,7 @@ export async function createEditor(container: HTMLElement) {
     await arrange.layout();
     AreaExtensions.zoomAt(area, editor.getNodes());
 
-    return { destroy: () => area.destroy() };
+    return {
+        destroy: () => area.destroy(),
+    };
 }

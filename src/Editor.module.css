@@ -18,18 +18,6 @@
     font-weight: bold;
 }
 
-.node {
-    background-color: #f0f0f0; 
-    border: 1px solid #ccc;
-    color: rgb(31, 28, 28);
-}
-
-.node.selected {
-    background-color: #a0d3ff;
-    border: 1px solid #007bff;
-    color: rgb(0, 0, 0); 
-}
-
 .rete {
     height: 100%;
     width: 100%;
