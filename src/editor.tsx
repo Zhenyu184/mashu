@@ -7,13 +7,7 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { DataflowEngine } from 'rete-engine';
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 
-import { invoke } from '@tauri-apps/api/core';
-
 const socket = new ClassicPreset.Socket('socket');
-
-async function request_f() {
-    await invoke('request', { 'https://www.rust-lang.org': String});
-}
 
 class RequestNode extends ClassicPreset.Node<
     {},
@@ -34,7 +28,6 @@ class RequestNode extends ClassicPreset.Node<
     }
 
     job() {
-        request_f()
         return;
     }
 }
@@ -108,9 +101,9 @@ class AddNode extends ClassicPreset.Node<
     }
 }
 
+import { HeadNode, EndNode, SleepNode, TimingNode, InitWebNode, OpenWebNode } from './node';
+type Node = NumberNode | AddNode | RequestNode | HeadNode | EndNode | SleepNode | TimingNode | InitWebNode | OpenWebNode;
 class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
-
-type Node = NumberNode | AddNode | RequestNode;
 type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
 type Schemes = GetSchemes<Node, ConnProps>;
 
@@ -126,7 +119,6 @@ export async function createEditor(container: HTMLElement) {
 
     function process() {
         engine.reset();
-
         editor
             .getNodes()
             .filter((n) => n instanceof AddNode)
@@ -135,6 +127,12 @@ export async function createEditor(container: HTMLElement) {
 
     const contextMenu = new ContextMenuPlugin<Schemes>({
         items: ContextMenuPresets.classic.setup([
+            ['HeadNode', () => new HeadNode()],
+            ['EndNode', () => new EndNode()],
+            ['SleepNode', () => new SleepNode()],
+            ['TimingNode', () => new TimingNode()],
+            ['InitWebNode', () => new InitWebNode()],
+            ['OpenWebNode', () => new OpenWebNode()],
             ['Number', () => new NumberNode(0, process)],
             ['Add', () => new AddNode(process, (c) => area.update('control', c.id))],
         ]),
@@ -188,5 +186,7 @@ export async function createEditor(container: HTMLElement) {
     await arrange.layout();
     AreaExtensions.zoomAt(area, editor.getNodes());
 
-    return { destroy: () => area.destroy() };
+    return {
+        destroy: () => area.destroy(),
+    };
 }
