@@ -113,9 +113,6 @@ import {
     SummitNode,
 } from './node';
 type Node =
-    | NumberNode
-    | AddNode
-    | RequestNode
     | HeadNode
     | EndNode
     | SleepNode
@@ -125,10 +122,10 @@ type Node =
     | InputStringNode
     | PressButtonNode
     | SummitNode;
-class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
-type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
-type Schemes = GetSchemes<Node, ConnProps>;
 
+class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
+type ConnProps = Connection<Node, Node>;
+type Schemes = GetSchemes<Node, ConnProps>;
 type AreaExtra = ReactArea2D<any> | ContextMenuExtra;
 
 export async function createEditor(container: HTMLElement) {
@@ -139,7 +136,8 @@ export async function createEditor(container: HTMLElement) {
     const arrange = new AutoArrangePlugin<Schemes>();
     const engine = new DataflowEngine<Schemes>();
 
-    function connectDetection() {
+    // recalculate
+    function recalculate() {
         engine.reset();
         editor
             .getNodes()
@@ -155,8 +153,7 @@ export async function createEditor(container: HTMLElement) {
             ['TimingNode', () => new TimingNode()],
             ['InitWebNode', () => new InitWebNode()],
             ['OpenWebNode', () => new OpenWebNode()],
-            ['Number', () => new NumberNode(0, connectDetection)],
-            ['Add', () => new AddNode(connectDetection, (c) => area.update('control', c.id))],
+            ['Number', () => new NumberNode(0, recalculate)],
         ]),
     });
 
@@ -179,29 +176,44 @@ export async function createEditor(container: HTMLElement) {
     AreaExtensions.simpleNodesOrder(area);
     AreaExtensions.showInputControl(area);
 
+    // pipe change detection
     editor.addPipe((context) => {
         if (['connectioncreated', 'connectionremoved'].includes(context.type)) {
-            connectDetection();
+            recalculate();
         }
         return context;
     });
 
-    // interface layout
-    const a = new NumberNode(1, connectDetection);
-    const b = new NumberNode(1, connectDetection);
-    const c = new AddNode(connectDetection, (c) => area.update('control', c.id));
-    const d = new RequestNode('https://www.rust-lang.org', connectDetection);
+    // init layout
+    const ct001 = new HeadNode();
+    const op001 = new InitWebNode();
+    const op002 = new OpenWebNode();
+    const op003 = new InputStringNode();
+    const op004 = new SummitNode();
+    const ct003 = new SleepNode();
+    const ct002 = new EndNode();
 
-    const con1 = new Connection(a, 'value', c, 'left');
-    const con2 = new Connection(b, 'value', c, 'right');
+    await editor.addNode(ct001);
+    await editor.addNode(op001);
+    await editor.addNode(op002);
+    await editor.addNode(op003);
+    await editor.addNode(op004);
+    await editor.addNode(ct003);
+    await editor.addNode(ct002);
 
-    await editor.addNode(a);
-    await editor.addNode(b);
-    await editor.addNode(c);
-    await editor.addNode(d);
+    const con1 = new Connection(ct001, 'success', op001, 'entry');
+    const con2 = new Connection(op001, 'success', op002, 'entry');
+    const con3 = new Connection(op002, 'success', op003, 'entry');
+    const con4 = new Connection(op003, 'success', op004, 'entry');
+    const con5 = new Connection(op004, 'success', ct003, 'entry');
+    const con6 = new Connection(ct003, 'success', ct002, 'entry');
 
     await editor.addConnection(con1);
     await editor.addConnection(con2);
+    await editor.addConnection(con3);
+    await editor.addConnection(con4);
+    await editor.addConnection(con5);
+    await editor.addConnection(con6);
 
     await arrange.layout();
     AreaExtensions.zoomAt(area, editor.getNodes());

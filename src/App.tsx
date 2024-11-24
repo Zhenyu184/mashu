@@ -1,7 +1,7 @@
 import './App.css';
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
+// import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 
 // rete.js
 import { createEditor } from './editor';
@@ -35,18 +35,6 @@ function App() {
     async function clear_msg() {
         setGreetMsg('');
     }
-
-    // async function saveFile() {
-    //     const content = '';
-    //     const filePath = 'saved_file.txt';
-
-    //     try {
-    //         await writeTextFile(filePath, content);
-    //         setGreetMsg('save success');
-    //     } catch (err) {
-    //         setGreetMsg('save fail');
-    //     }
-    // }
 
     return (
         <main className='container'>
