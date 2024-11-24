@@ -1,16 +1,17 @@
 import './App.css';
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 
 // rete.js
 import { createEditor } from './editor';
 import { useRete } from 'rete-react-plugin';
+import styles from './Editor.module.css';
 
 function App() {
     const [greetMsg, setGreetMsg] = useState('');
-    const [name, setName] = useState('');
-
     const [editor] = useRete(createEditor);
+    const [name, setName] = useState('');
 
     async function greet() {
         setGreetMsg(await invoke('greet', { name }));
@@ -23,7 +24,7 @@ function App() {
             const body = (await invoke('run_workflow', { script })) as string;
             setGreetMsg(body);
         } catch (err) {
-            console.log('err:', err);
+            console.error(err);
         }
     }
 
@@ -34,6 +35,18 @@ function App() {
     async function clear_msg() {
         setGreetMsg('');
     }
+
+    // async function saveFile() {
+    //     const content = '';
+    //     const filePath = 'saved_file.txt';
+
+    //     try {
+    //         await writeTextFile(filePath, content);
+    //         setGreetMsg('save success');
+    //     } catch (err) {
+    //         setGreetMsg('save fail');
+    //     }
+    // }
 
     return (
         <main className='container'>
@@ -57,7 +70,7 @@ function App() {
                 </form>
 
                 <div className='button-container'>
-                    <button type='button' onClick={(_) => run_workflow('../plugins/login_google.ts')}>
+                    <button type='button' onClick={(_) => run_workflow('../plugins/simple_google_search.ts')}>
                         Run
                     </button>
                     <button type='button' onClick={(_) => stop_workflow()}>
@@ -68,11 +81,16 @@ function App() {
                     </button>
                 </div>
 
+                <div className='button-container'>
+                    <button type='button' onClick={(_) => run_workflow('../plugins/simple_google_search.ts')}>
+                        Save Current Script
+                    </button>
+                </div>
+
                 <p>{greetMsg}</p>
             </div>
-
-            <div className='editor-space'>
-                <div ref={editor} className='rete' style={{ height: '100%', width: '100%' }}></div>
+            <div className={styles.editorSpace}>
+                <div ref={editor} className={styles.rete}></div>
             </div>
         </main>
     );

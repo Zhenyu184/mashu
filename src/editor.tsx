@@ -7,13 +7,7 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { DataflowEngine } from 'rete-engine';
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 
-import { invoke } from '@tauri-apps/api/core';
-
 const socket = new ClassicPreset.Socket('socket');
-
-async function request_f() {
-    await invoke('request', { 'https://www.rust-lang.org': String});
-}
 
 class RequestNode extends ClassicPreset.Node<
     {},
@@ -34,7 +28,6 @@ class RequestNode extends ClassicPreset.Node<
     }
 
     job() {
-        request_f()
         return;
     }
 }
@@ -108,9 +101,31 @@ class AddNode extends ClassicPreset.Node<
     }
 }
 
+import {
+    HeadNode,
+    EndNode,
+    SleepNode,
+    TimingNode,
+    InitWebNode,
+    OpenWebNode,
+    InputStringNode,
+    PressButtonNode,
+    SummitNode,
+} from './node';
+type Node =
+    | NumberNode
+    | AddNode
+    | RequestNode
+    | HeadNode
+    | EndNode
+    | SleepNode
+    | TimingNode
+    | InitWebNode
+    | OpenWebNode
+    | InputStringNode
+    | PressButtonNode
+    | SummitNode;
 class Connection<A extends Node, B extends Node> extends ClassicPreset.Connection<A, B> {}
-
-type Node = NumberNode | AddNode | RequestNode;
 type ConnProps = Connection<NumberNode, AddNode> | Connection<AddNode, AddNode>;
 type Schemes = GetSchemes<Node, ConnProps>;
 
@@ -124,9 +139,8 @@ export async function createEditor(container: HTMLElement) {
     const arrange = new AutoArrangePlugin<Schemes>();
     const engine = new DataflowEngine<Schemes>();
 
-    function process() {
+    function connectDetection() {
         engine.reset();
-
         editor
             .getNodes()
             .filter((n) => n instanceof AddNode)
@@ -135,21 +149,25 @@ export async function createEditor(container: HTMLElement) {
 
     const contextMenu = new ContextMenuPlugin<Schemes>({
         items: ContextMenuPresets.classic.setup([
-            ['Number', () => new NumberNode(0, process)],
-            ['Add', () => new AddNode(process, (c) => area.update('control', c.id))],
+            ['HeadNode', () => new HeadNode()],
+            ['EndNode', () => new EndNode()],
+            ['SleepNode', () => new SleepNode()],
+            ['TimingNode', () => new TimingNode()],
+            ['InitWebNode', () => new InitWebNode()],
+            ['OpenWebNode', () => new OpenWebNode()],
+            ['Number', () => new NumberNode(0, connectDetection)],
+            ['Add', () => new AddNode(connectDetection, (c) => area.update('control', c.id))],
         ]),
     });
-    area.use(contextMenu);
 
+    area.use(contextMenu);
     AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
         accumulating: AreaExtensions.accumulateOnCtrl(),
     });
 
     render.addPreset(Presets.contextMenu.setup());
     render.addPreset(Presets.classic.setup());
-
     connection.addPreset(ConnectionPresets.classic.setup());
-
     arrange.addPreset(ArrangePresets.classic.setup());
 
     editor.use(engine);
@@ -163,16 +181,16 @@ export async function createEditor(container: HTMLElement) {
 
     editor.addPipe((context) => {
         if (['connectioncreated', 'connectionremoved'].includes(context.type)) {
-            process();
+            connectDetection();
         }
         return context;
     });
 
     // interface layout
-    const a = new NumberNode(1, process);
-    const b = new NumberNode(1, process);
-    const c = new AddNode(process, (c) => area.update('control', c.id));
-    const d = new RequestNode('https://www.rust-lang.org', process);
+    const a = new NumberNode(1, connectDetection);
+    const b = new NumberNode(1, connectDetection);
+    const c = new AddNode(connectDetection, (c) => area.update('control', c.id));
+    const d = new RequestNode('https://www.rust-lang.org', connectDetection);
 
     const con1 = new Connection(a, 'value', c, 'left');
     const con2 = new Connection(b, 'value', c, 'right');
@@ -188,5 +206,7 @@ export async function createEditor(container: HTMLElement) {
     await arrange.layout();
     AreaExtensions.zoomAt(area, editor.getNodes());
 
-    return { destroy: () => area.destroy() };
+    return {
+        destroy: () => area.destroy(),
+    };
 }

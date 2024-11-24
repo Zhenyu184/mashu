@@ -50,14 +50,6 @@
     width: 100%;
 }
 
-.editor-space {
-    flex: 1;
-    padding: 0px;
-    overflow: auto;
-    background-color: #353535;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
 .logo.tauri:hover {
     filter: drop-shadow(0 0 2em #24c8db);
 }

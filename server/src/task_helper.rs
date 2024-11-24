@@ -1,16 +1,22 @@
-use thirtyfour::{WebDriver, By, WebElement, error::{WebDriverError, WebDriverErrorInfo}};
+use thirtyfour::{
+    error::{WebDriverError, WebDriverErrorInfo},
+    By, WebDriver, WebElement,
+};
 // use tokio::runtime::Runtime;
 
-pub async fn find_component(driver: &WebDriver, selector: &str) -> Result<WebElement, WebDriverError> {
+pub async fn find_component(
+    driver: &WebDriver,
+    selector: &str,
+) -> Result<WebElement, WebDriverError> {
     match (
         driver.find(By::Id(selector)).await,
         driver.find(By::Name(selector)).await,
         driver.find(By::Css(selector)).await,
     ) {
         (Ok(elem), _, _) | (_, Ok(elem), _) | (_, _, Ok(elem)) => Ok(elem),
-        (Err(_), Err(_), Err(_)) => Err(WebDriverError::NoSuchElement(
-            WebDriverErrorInfo::new(format!("Element not found with selector: {}", selector))
-        ))
+        (Err(_), Err(_), Err(_)) => Err(WebDriverError::NoSuchElement(WebDriverErrorInfo::new(
+            format!("Element not found with selector: {}", selector),
+        ))),
     }
 }
 
@@ -27,4 +33,4 @@ pub async fn find_component(driver: &WebDriver, selector: &str) -> Result<WebEle
 //         .first()
 //         .await?;
 //     Ok(elem)
-// } 
+// }
