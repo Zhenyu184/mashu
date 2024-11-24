@@ -100,4 +100,61 @@ class OpenWebNode extends ClassicPreset.Node<
     }
 }
 
-export { HeadNode, EndNode, SleepNode, TimingNode, InitWebNode, OpenWebNode };
+class InputStringNode extends ClassicPreset.Node<
+    { entry: ClassicPreset.Socket },
+    { success: ClassicPreset.Socket; failure: ClassicPreset.Socket }
+> {
+    height = baseHeight + heightUnit * 3;
+    width = uniformWidth;
+
+    constructor() {
+        super('InputStringNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+        this.addOutput('failure', new ClassicPreset.Output(socket, 'Failure'));
+    }
+
+    data(): { value: any } {
+        return { value: null };
+    }
+}
+
+class PressButtonNode extends ClassicPreset.Node<
+    { entry: ClassicPreset.Socket },
+    { success: ClassicPreset.Socket; failure: ClassicPreset.Socket }
+> {
+    height = baseHeight + heightUnit * 3;
+    width = uniformWidth;
+
+    constructor() {
+        super('PressButtonNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+        this.addOutput('failure', new ClassicPreset.Output(socket, 'Failure'));
+    }
+
+    data(): { value: any } {
+        return { value: null };
+    }
+}
+
+class SummitNode extends ClassicPreset.Node<
+    { entry: ClassicPreset.Socket },
+    { success: ClassicPreset.Socket; failure: ClassicPreset.Socket }
+> {
+    height = baseHeight + heightUnit * 3;
+    width = uniformWidth;
+
+    constructor() {
+        super('SummitNode');
+        this.addInput('entry', new ClassicPreset.Input(socket, 'Entry'));
+        this.addOutput('success', new ClassicPreset.Output(socket, 'Success'));
+        this.addOutput('failure', new ClassicPreset.Output(socket, 'Failure'));
+    }
+
+    data(): { value: any } {
+        return { value: null };
+    }
+}
+
+export { HeadNode, EndNode, SleepNode, TimingNode, InitWebNode, OpenWebNode, InputStringNode, PressButtonNode, SummitNode };

@@ -1,10 +1,10 @@
-use std::str::FromStr;
-use std::collections::HashMap;
-use std::{thread, time::Duration};
 use chrono::Utc;
 use cron::Schedule;
-use thirtyfour::prelude::*;
+use std::collections::HashMap;
+use std::str::FromStr;
+use std::{thread, time::Duration};
 use thirtyfour::error::WebDriverErrorInfo;
+use thirtyfour::prelude::*;
 use tokio::runtime::Runtime;
 
 use crate::task_helper;
@@ -51,7 +51,7 @@ impl Workspace {
 
     pub fn log(&mut self, message: &str) {
         self.execution_log.push(message.to_string());
-        println!("[{}] {}",self.id, message);
+        println!("[{}] {}", self.id, message);
     }
 }
 
@@ -75,7 +75,10 @@ impl BaseTask {
 
 impl Task for BaseTask {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
-        ws.log(&format!("run base task, name: {}, type: {}", self.task_name, self.task_type));
+        ws.log(&format!(
+            "run base task, name: {}, type: {}",
+            self.task_name, self.task_type
+        ));
         ExecutionResult::Success
     }
 }
@@ -126,12 +129,10 @@ impl EndTack {
 impl Task for EndTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log("run end: cleaning workspace");
-        
+
         if let Some(driver) = ws.web_driver.take() {
             let run = Runtime::new().expect("create runtime fail");
-            let _ = run.block_on(async {
-                driver.quit().await
-            });
+            let _ = run.block_on(async { driver.quit().await });
         }
         ws.web_driver = None;
         ws.variables.clear();
@@ -142,7 +143,7 @@ impl Task for EndTack {
 
 pub struct SleepTack {
     base: ControlTask,
-    time: u64
+    time: u64,
 }
 
 impl SleepTack {
@@ -194,7 +195,7 @@ impl Task for TimingTack {
                 return ExecutionResult::Failure;
             }
         };
-        
+
         let duration = next_trigger_time - Utc::now();
         let offset_duration = duration.num_seconds().saturating_sub(8 * 60 * 60);
         thread::sleep(Duration::from_secs(offset_duration as u64));
@@ -233,13 +234,11 @@ impl Task for InitWebTack {
         // let caps = DesiredCapabilities::chrome();
         let caps = DesiredCapabilities::firefox();
         let rt = Runtime::new().expect("create runtime fail");
-        match rt.block_on(async {
-            WebDriver::new(&self.url, caps).await
-        }) {
+        match rt.block_on(async { WebDriver::new(&self.url, caps).await }) {
             Ok(driver) => {
                 ws.set_web_driver(driver);
                 ExecutionResult::Success
-            },
+            }
             Err(_) => ExecutionResult::Failure,
         }
     }
@@ -254,7 +253,9 @@ impl OpenWebTack {
     pub fn new(url: Option<&str>) -> Self {
         OpenWebTack {
             base: OperateTask::new("open_web"),
-            url: url.unwrap_or("www.wikipedia.org/wiki/Red_panda").to_string(),
+            url: url
+                .unwrap_or("www.wikipedia.org/wiki/Red_panda")
+                .to_string(),
         }
     }
 }
@@ -337,7 +338,7 @@ impl PressButtonTack {
 impl Task for PressButtonTack {
     fn execute(&self, ws: &mut Workspace) -> ExecutionResult {
         ws.log(&format!("run press button"));
-        
+
         let driver = match ws.get_web_driver() {
             Some(driver) => driver,
             None => return ExecutionResult::Failure,
