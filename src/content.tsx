@@ -3,7 +3,13 @@ class ContentManager {
     private content: string;
 
     private constructor() {
-        this.content = '';
+        this.content = `
+            flowchart TD
+                ct001["name: head,  type: control"]
+                ct002["name: end,   type: control"]
+
+                ct001 -->|success| ct002
+            `;
     }
 
     public static getInstance(): ContentManager {
@@ -13,12 +19,18 @@ class ContentManager {
         return ContentManager.instance;
     }
 
-    public setContent(newContent: string): void {
-        this.content = newContent;
-    }
-
     public getContent(): string {
         return this.content;
+    }
+
+    public registerNode(id: string, name: string, type: string, para: string): void {
+        const addComtent = `${id}["name: ${name}, type: ${type}, para: ${para}"]`;
+    }
+
+    public unregisterNode(id: string): void {}
+
+    public setContent(newContent: string): void {
+        this.content = newContent;
     }
 }
 

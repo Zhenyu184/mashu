@@ -1,9 +1,4 @@
 import { ClassicPreset } from 'rete';
-import contentManager from './content';
-
-contentManager.setContent('test content');
-const currentContent = contentManager.getContent();
-console.log(currentContent);
 
 const socket = new ClassicPreset.Socket('socket');
 const baseHeight = 47;

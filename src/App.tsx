@@ -6,7 +6,7 @@ import { invoke } from '@tauri-apps/api/core';
 // rete.js
 import { createEditor } from './editor';
 import { useRete } from 'rete-react-plugin';
-import styles from './Editor.module.css';
+import styles from './editor.module.css';
 
 function App() {
     const [greetMsg, setGreetMsg] = useState('');

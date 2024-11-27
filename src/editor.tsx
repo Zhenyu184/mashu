@@ -7,30 +7,8 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import { DataflowEngine } from 'rete-engine';
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from 'rete-context-menu-plugin';
 
-const socket = new ClassicPreset.Socket('socket');
-
-class RequestNode extends ClassicPreset.Node<
-    {},
-    { value: ClassicPreset.Socket },
-    { text: ClassicPreset.InputControl<'text'> }
-> {
-    height = 135;
-    width = 300;
-
-    constructor(initial: string, change?: (value: string) => void) {
-        super('RequestNode');
-        this.addControl('text', new ClassicPreset.InputControl('text', { initial, change }));
-        this.addOutput('value', new ClassicPreset.Output(socket, 'output name'));
-    }
-
-    data(): { value: string } {
-        return { value: this.controls.text.value || '' };
-    }
-
-    job() {
-        return;
-    }
-}
+import contentManager from './content';
+const curr = contentManager.getContent();
 
 class NumberNode extends ClassicPreset.Node<
     {},
